@@ -93,6 +93,7 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
             LoadTrDatas();
         }
 
+        // OpenApi.Models reference 용으로 사용
         async void GetData()
         {
             t1102 주식현재가 = new()

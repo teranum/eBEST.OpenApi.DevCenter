@@ -16,7 +16,6 @@ internal partial class MainViewModel
         {
             StatusText = "Connected";
             OutputLog(LogKind.LOGS, "로그인 성공" + (_openApi.ServerType == EBestOpenApi.SERVER_TYPE.모의투자 ? "(모의서버)" : "(실서버)"));
-            GetData();
         }
         else
         {
