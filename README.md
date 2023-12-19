@@ -8,7 +8,6 @@ Visual Studio 2022, NET8.0
 ## 설치
 <br/>
 [릴리즈 버젼](https://github.com/teranum/eBEST.OpenApi.DevCenter/releases)
-/releases
 
 ## 사용법
 
