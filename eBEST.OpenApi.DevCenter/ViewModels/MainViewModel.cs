@@ -24,9 +24,6 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
         [ObservableProperty] string _equipText = "";
         [ObservableProperty] int _equipHeight = 220;
 
-        //[ObservableProperty] ObservableCollection<TabTreeData> _tabTreeDatas;
-        //[ObservableProperty] TabTreeData _selectedTabTreeData;
-
         private readonly IAppRegistry _appRegistry;
         private readonly Window _mainWindow;
         private readonly EBestOpenApi _openApi;

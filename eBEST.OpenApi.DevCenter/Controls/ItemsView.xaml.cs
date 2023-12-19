@@ -99,7 +99,7 @@ namespace eBEST.OpenApi.DevCenter.Controls
                                 Tag = orgitem.Tag,
                                 Key = orgitem.Key,
                                 IsExpanded = true,
-                                IsActived = orgitem.Name.IndexOf(text, StringComparison.OrdinalIgnoreCase) >= 0,
+                                IsActived = orgitem.Name.Contains(text, StringComparison.OrdinalIgnoreCase),
                             };
                             me.AddChild(finded);
                         }
@@ -109,7 +109,7 @@ namespace eBEST.OpenApi.DevCenter.Controls
 
             if (me == null)
             {
-                if (orgitem.Name.IndexOf(text, StringComparison.OrdinalIgnoreCase) >= 0)
+                if (orgitem.Name.Contains(text, StringComparison.OrdinalIgnoreCase))
                 {
                     me = new IdTextItem(orgitem.Id, orgitem.Name)
                     {
@@ -127,7 +127,7 @@ namespace eBEST.OpenApi.DevCenter.Controls
         {
             IdTextItem? me = null;
 
-            if (orgitem.Name.IndexOf(text, StringComparison.OrdinalIgnoreCase) >= 0)
+            if (orgitem.Name.Contains(text, StringComparison.OrdinalIgnoreCase))
             {
                 me = CopyItem(orgitem);
                 me.IsActived = true;
