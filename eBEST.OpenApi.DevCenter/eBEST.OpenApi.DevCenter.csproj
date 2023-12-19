@@ -20,10 +20,6 @@
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="*" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="*" />
 		<PackageReference Include="AvalonEdit" Version="*" />
-	</ItemGroup>
-
-
-	<ItemGroup>
 		<PackageReference Include="eBEST.OpenApi.Models" Version="1.2.0" />
 	</ItemGroup>
 
