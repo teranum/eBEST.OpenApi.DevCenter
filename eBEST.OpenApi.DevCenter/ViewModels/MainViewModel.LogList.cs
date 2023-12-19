@@ -1,5 +1,4 @@
-﻿using App.Helpers;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using eBEST.OpenApi.DevCenter.Models;
 using System.Text;
@@ -70,7 +69,7 @@ internal partial class MainViewModel
             var vals = Text.Split(':', StringSplitOptions.RemoveEmptyEntries);
             if (vals.Length > 2)
             {
-                string code = vals[vals.Length-2].Trim();
+                string code = vals[vals.Length - 2].Trim();
                 if (_modelClasses.TryGetValue(code, out var modelClass))
                 {
                     SelectPanelType(modelClass);

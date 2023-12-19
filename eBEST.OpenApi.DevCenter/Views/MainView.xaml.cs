@@ -1,7 +1,6 @@
 ﻿using eBEST.OpenApi.DevCenter.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 
 namespace eBEST.OpenApi.DevCenter.Views
 {

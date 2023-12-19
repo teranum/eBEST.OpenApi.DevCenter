@@ -5,7 +5,6 @@ using eBEST.OpenApi.Models;
 using System.Collections;
 using System.Diagnostics;
 using System.Reflection;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
@@ -355,7 +354,8 @@ internal partial class MainViewModel
     }
 
     bool bModelSrcMode = false;
-    [RelayCommand] void ModelSrc()
+    [RelayCommand]
+    void ModelSrc()
     {
         if (_selectedPanelType == null) return;
         Type tType = _selectedPanelType!;
