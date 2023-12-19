@@ -29,7 +29,7 @@ internal partial class MainViewModel
         }
         else if (text.Equals("DevCenter 오픈소스"))
         {
-            var sInfo = new System.Diagnostics.ProcessStartInfo("https://github.com/teranum/eBEST.OpenApi")
+            var sInfo = new System.Diagnostics.ProcessStartInfo("https://github.com/teranum/eBEST.OpenApi.DevCenter")
             {
                 UseShellExecute = true,
             };
