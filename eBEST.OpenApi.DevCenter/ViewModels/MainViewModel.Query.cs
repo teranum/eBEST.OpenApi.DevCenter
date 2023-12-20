@@ -176,7 +176,7 @@ internal partial class MainViewModel
         (string out_tr_cd, string out_tr_cont, string out_tr_cont_key, string jsonResponse) = await _openApi.GetDataWithJsonString(path, tr_code, tr_cont, tr_cont_key, jsonbody).ConfigureAwait(true);
 
         Res_Time = $"응답시간 : {DateTime.Now.ToString("HH:mm:ss.fff")}";
-        
+
 
         OutputLog(LogKind.최근조회TR, $"{_selectedPanelType.Name} : {pathAttribute.Description}");
 

@@ -1,7 +1,6 @@
 ﻿using eBEST.OpenApi.DevCenter.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 
 namespace eBEST.OpenApi.DevCenter.Views
 {
@@ -28,38 +27,6 @@ namespace eBEST.OpenApi.DevCenter.Views
                     viewModel.OnDataGridCellEditEnding();
                 }
             }
-        }
-
-        private void DataGrid_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            //if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control && sender is DataGrid dataGrid)
-            //{
-            //    if (e.Key == System.Windows.Input.Key.V)
-            //    {
-            //        if (dataGrid.SelectedCells.Count > 0)
-            //        {
-            //            var firstCell = dataGrid.SelectedCells[0];
-            //            var item = firstCell.Item;
-            //            var column = firstCell.Column;
-            //            var cellContent = column.GetCellContent(item);
-            //            if (cellContent is TextBlock textBlock)
-            //            {
-            //                string text = Clipboard.GetText();
-            //                text = text.Trim(['\r', '\n']);
-
-
-
-
-            //                textBlock.Text = text;
-            //            }
-            //        }
-            //    }
-            //}
-        }
-
-        private void MenuItem_Click_DataGridCopy(object sender, RoutedEventArgs e)
-        {
-
         }
     }
 }
