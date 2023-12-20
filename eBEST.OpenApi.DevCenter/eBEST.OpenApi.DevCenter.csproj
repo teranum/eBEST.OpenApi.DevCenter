@@ -11,9 +11,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <None Remove="Resources\Balls_3.png" />
-	  <None Remove="Resources\icons.png" />
-	  <None Remove="Resources\userimages.bmp" />
+		<Resource Include="app.ico" />
+		<Resource Include="Resources\Balls_3.png" />
+		<Resource Include="Resources\icons.png" />
+		<SplashScreen Include="splash.png" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -21,11 +22,6 @@
 		<PackageReference Include="AvalonEdit" Version="*" />
 		<PackageReference Include="eBEST.OpenApi" Version="*" />
 		<PackageReference Include="eBEST.OpenApi.Models" Version="*" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Resource Include="Resources\Balls_3.png" />
-	  <Resource Include="Resources\icons.png" />
 	</ItemGroup>
 
 </Project>
