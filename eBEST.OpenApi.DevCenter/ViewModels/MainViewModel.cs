@@ -114,8 +114,13 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
         [RelayCommand(CanExecute = nameof(CanLogin))]
         void MenuLogin()
         {
-            string AppKey = _appRegistry.GetValue("InitData", "AppKey", "");
-            string SecretKey = _appRegistry.GetValue("InitData", "SecretKey", "");
+            string AppKey = string.Empty;
+            string SecretKey = string.Empty;
+#if DEBUG
+            // 개발용에서는 간편 키보관 허용
+            AppKey = _appRegistry.GetValue("InitData", "AppKey", "");
+            SecretKey = _appRegistry.GetValue("InitData", "SecretKey", "");
+#endif
             var keyWindow = new AppKey();
             keyWindow.textAppKey.Text = AppKey;
             keyWindow.textSecretKey.Text = SecretKey;
@@ -123,8 +128,11 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
             {
                 AppKey = keyWindow.textAppKey.Text;
                 SecretKey = keyWindow.textSecretKey.Text;
+#if DEBUG
+                // 개발용에서는 간편 키보관 허용
                 _appRegistry.SetValue("InitData", "AppKey", AppKey);
                 _appRegistry.SetValue("InitData", "SecretKey", SecretKey);
+#endif
                 _ = _openApi.ConnectAsync(AppKey, SecretKey);
             }
         }
