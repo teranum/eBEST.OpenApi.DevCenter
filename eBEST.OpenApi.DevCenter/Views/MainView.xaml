@@ -20,342 +20,447 @@
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Menu
-            Height="22"
-            Margin="0,0,2,0"
-            VerticalAlignment="Top">
-            <MenuItem Header="파일">
-                <MenuItem Command="{Binding MenuLoginCommand}" Header="OpenApi 접속" />
-                <Separator />
-                <MenuItem Command="{Binding MenuExitCommand}" Header="끝내기" />
-            </MenuItem>
-            <MenuItem Header="보기">
-                <MenuItem
-                    Header="항상위"
-                    IsCheckable="True"
-                    IsChecked="{Binding ElementName=root, Path=Topmost, Mode=TwoWay}" />
-            </MenuItem>
-            <MenuItem Header="{Binding MenuCustomizeHeaderText}" ItemsSource="{Binding MenuCustomizeItems}">
-                <MenuItem.ItemContainerStyle>
-                    <Style TargetType="{x:Type MenuItem}">
-                        <Setter Property="Command" Value="{Binding Path=DataContext.MenuCustomizeCommand, ElementName=root}" />
-                        <Setter Property="CommandParameter" Value="{Binding Path=Header, RelativeSource={RelativeSource self}}" />
-                    </Style>
-                </MenuItem.ItemContainerStyle>
-            </MenuItem>
-        </Menu>
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition
-                    Width="{Binding TabTreeWidth, Mode=TwoWay}"
-                    MinWidth="100"
-                    d:Width="200" />
-                <ColumnDefinition Width="4" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Controls:ItemsView
-                Grid.Column="0"
-                ItemsSource="{Binding TabTreeDatas}"
-                SelectedItem="{Binding SelectedTabTreeData}"
-                SelectedTreeItem="{Binding SelectedTreeItem, Mode=OneWayToSource}"
-                TabStripPlacement="Bottom" />
-            <GridSplitter
-                Grid.Column="1"
-                Width="4"
-                HorizontalAlignment="Center"
-                Background="White" />
-            <Grid Grid.Column="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" MinHeight="200" />
-                    <RowDefinition Height="4" />
-                    <RowDefinition
-                        Height="{Binding TabListHeight, Mode=TwoWay}"
-                        MinHeight="100"
-                        d:Height="100" />
-                </Grid.RowDefinitions>
-                <Grid Grid.Row="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="4" />
-                        <ColumnDefinition
-                            Width="{Binding PropertyWidth, Mode=TwoWay}"
-                            MinWidth="100"
-                            d:Width="200" />
-                    </Grid.ColumnDefinitions>
-                    <Grid Grid.Column="0">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition />
-                        </Grid.RowDefinitions>
-                        <TextBox
-                            Grid.Row="0"
-                            Height="22"
-                            Margin="0,0,280,0"
-                            VerticalContentAlignment="Center"
-                            IsReadOnly="True"
-                            Text="{Binding TRName}" />
-                        <Button
-                            Grid.Row="0"
-                            Width="60"
-                            Margin="0,0,210,0"
-                            HorizontalAlignment="Right"
-                            Command="{Binding QueryCommand}"
-                            Content="조 회" />
-                        <Button
-                            Grid.Row="0"
-                            Width="60"
-                            Margin="0,0,130,0"
-                            HorizontalAlignment="Right"
-                            Command="{Binding QueryNextCommand}"
-                            Content="다 음" />
-                        <Button
-                            Grid.Row="0"
-                            Width="60"
-                            Margin="0,0,30,0"
-                            HorizontalAlignment="Right"
-                            Command="{Binding ModelSrcCommand}"
-                            Content="모델소스" />
-                        <Grid Grid.Row="1">
+        <Grid Grid.Row="0">
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition
+                        Width="{Binding TabTreeWidth, Mode=TwoWay}"
+                        MinWidth="100"
+                        d:Width="200" />
+                    <ColumnDefinition Width="4" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Menu Height="22" VerticalAlignment="Top">
+                        <MenuItem Header="파일">
+                            <MenuItem Command="{Binding MenuLoginCommand}" Header="OpenApi 접속" />
+                            <Separator />
+                            <MenuItem Command="{Binding MenuExitCommand}" Header="끝내기" />
+                        </MenuItem>
+                        <MenuItem Header="보기">
+                            <MenuItem
+                                Header="항상위"
+                                IsCheckable="True"
+                                IsChecked="{Binding ElementName=root, Path=Topmost, Mode=TwoWay}" />
+                        </MenuItem>
+                        <MenuItem Header="{Binding MenuCustomizeHeaderText}" ItemsSource="{Binding MenuCustomizeItems}">
+                            <MenuItem.ItemContainerStyle>
+                                <Style TargetType="{x:Type MenuItem}">
+                                    <Setter Property="Command" Value="{Binding Path=DataContext.MenuCustomizeCommand, ElementName=root}" />
+                                    <Setter Property="CommandParameter" Value="{Binding Path=Header, RelativeSource={RelativeSource self}}" />
+                                </Style>
+                            </MenuItem.ItemContainerStyle>
+                        </MenuItem>
+                        <Menu.Background>
+                            <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                                <GradientStop Offset="1" Color="#FFF9F7F7" />
+                                <GradientStop Offset="0" Color="White" />
+                                <GradientStop Offset="0.517" Color="#FFCAC8C8" />
+                            </LinearGradientBrush>
+                        </Menu.Background>
+
+                    </Menu>
+                    <Controls:ItemsView
+                        Grid.Row="1"
+                        ItemsSource="{Binding TabTreeDatas}"
+                        SelectedItem="{Binding SelectedTabTreeData}"
+                        SelectedTreeItem="{Binding SelectedTreeItem, Mode=OneWayToSource}"
+                        TabStripPlacement="Bottom" />
+                </Grid>
+                <GridSplitter
+                    Grid.Column="1"
+                    Width="4"
+                    HorizontalAlignment="Center"
+                    Background="White" />
+                <Grid Grid.Column="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" MinHeight="200" />
+                        <RowDefinition Height="4" />
+                        <RowDefinition
+                            Height="{Binding TabListHeight, Mode=TwoWay}"
+                            MinHeight="100"
+                            d:Height="100" />
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="4" />
+                            <ColumnDefinition
+                                Width="{Binding PropertyWidth, Mode=TwoWay}"
+                                MinWidth="100"
+                                d:Width="200" />
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="0">
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="4" />
-                                <RowDefinition Height="{Binding EquipHeight}" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition />
                             </Grid.RowDefinitions>
-                            <StackPanel Grid.Row="0" Margin="0,3,0,0">
-                                <ItemsControl d:ItemsSource="{d:SampleData ItemCount=2}" ItemsSource="{Binding InBlockDatas}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <StackPanel>
-                                                <Label Content="{Binding DescName}" />
-                                                <DataGrid
-                                                    Height="{Binding Height}"
-                                                    MaxHeight="300"
-                                                    CanUserAddRows="False"
-                                                    CanUserDeleteRows="False"
-                                                    CanUserReorderColumns="False"
-                                                    CanUserResizeRows="False"
-                                                    CanUserSortColumns="False"
-                                                    CellEditEnding="DataGrid_CellEditEnding"
-                                                    HorizontalScrollBarVisibility="Visible"
-                                                    ItemsSource="{Binding BlockDatas}"
-                                                    SelectionMode="Single" />
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                                <ItemsControl d:ItemsSource="{d:SampleData ItemCount=4}" ItemsSource="{Binding OutBlockDatas}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <StackPanel>
-                                                <Label Content="{Binding DescName}" />
-                                                <DataGrid
-                                                    Height="{Binding Height}"
-                                                    MaxHeight="300"
-                                                    CanUserAddRows="False"
-                                                    CanUserDeleteRows="False"
-                                                    CanUserReorderColumns="False"
-                                                    CanUserResizeRows="False"
-                                                    CanUserSortColumns="False"
-                                                    HorizontalScrollBarVisibility="Visible"
-                                                    IsReadOnly="True"
-                                                    ItemsSource="{Binding BlockDatas}"
-                                                    ScrollViewer.HorizontalScrollBarVisibility="Visible"
-                                                    SelectionMode="Single" />
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </StackPanel>
-                            <GridSplitter
-                                Grid.Row="1"
-                                Height="4"
-                                HorizontalAlignment="Stretch"
+                            <TextBlock
+                                Grid.Row="0"
+                                Height="22"
+                                Padding="10,5,0,0"
                                 VerticalAlignment="Center"
-                                Background="LightGray" />
-                            <Controls:BindableAvalonEditor
-                                Grid.Row="2"
-                                Margin="0,3,0,0"
-                                BorderBrush="Gray"
-                                BorderThickness="1"
-                                FontFamily="Consolas"
-                                IsReadOnly="True"
-                                SyntaxHighlighting="C#"
-                                Text="{Binding EquipText}">
-                                <Controls:BindableAvalonEditor.ContextMenu>
-                                    <ContextMenu>
-                                        <MenuItem Command="ApplicationCommands.Copy" Header="복사" />
-                                        <Separator />
-                                        <MenuItem Command="ApplicationCommands.SelectAll" Header="모두 선택" />
-                                    </ContextMenu>
-                                </Controls:BindableAvalonEditor.ContextMenu>
-                            </Controls:BindableAvalonEditor>
+                                Text="TR 요청/응답">
+                                <TextBlock.Background>
+                                    <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                                        <GradientStop Offset="1" Color="#FFF9F7F7" />
+                                        <GradientStop Offset="0" Color="White" />
+                                        <GradientStop Offset="0.517" Color="#FFCAC8C8" />
+                                    </LinearGradientBrush>
+                                </TextBlock.Background>
+                            </TextBlock>
+                            <Grid Grid.Row="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <TextBox
+                                    Grid.Row="0"
+                                    Height="22"
+                                    Margin="0,0,280,0"
+                                    VerticalContentAlignment="Center"
+                                    IsReadOnly="True"
+                                    Text="{Binding TRName}" />
+                                <Button
+                                    Grid.Row="0"
+                                    Width="60"
+                                    Margin="0,0,210,0"
+                                    HorizontalAlignment="Right"
+                                    Command="{Binding QueryCommand}"
+                                    Content="조 회" />
+                                <Button
+                                    Grid.Row="0"
+                                    Width="60"
+                                    Margin="0,0,140,0"
+                                    HorizontalAlignment="Right"
+                                    Command="{Binding QueryNextCommand}"
+                                    Content="다 음" />
+                                <Button
+                                    Grid.Row="0"
+                                    Width="60"
+                                    Margin="0,0,10,0"
+                                    HorizontalAlignment="Right"
+                                    Command="{Binding ModelSrcCommand}"
+                                    Content="모델소스" />
+                                <Grid Grid.Row="1">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="4" />
+                                        <RowDefinition Height="{Binding EquipHeight}" />
+                                    </Grid.RowDefinitions>
+                                    <StackPanel Grid.Row="0" Margin="0,3,0,0">
+                                        <ItemsControl d:ItemsSource="{d:SampleData ItemCount=2}" ItemsSource="{Binding InBlockDatas}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel>
+                                                        <Label Content="{Binding DescName}" />
+                                                        <DataGrid
+                                                            MaxHeight="300"
+                                                            CanUserAddRows="False"
+                                                            CanUserDeleteRows="False"
+                                                            CanUserReorderColumns="False"
+                                                            CanUserResizeRows="False"
+                                                            CanUserSortColumns="False"
+                                                            CellEditEnding="DataGrid_CellEditEnding"
+                                                            HorizontalScrollBarVisibility="Visible"
+                                                            ItemsSource="{Binding BlockDatas}"
+                                                            SelectionMode="Single"
+                                                            SelectionUnit="Cell"
+                                                            Tag="{Binding DataContext, ElementName=root}">
+                                                            <DataGrid.ContextMenu>
+                                                                <ContextMenu>
+                                                                    <MenuItem
+                                                                        Command="{Binding PlacementTarget.Tag.DataCopyCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                        CommandParameter="{Binding}"
+                                                                        Header="데이터 복사" />
+                                                                </ContextMenu>
+                                                            </DataGrid.ContextMenu>
+                                                        </DataGrid>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                        <ItemsControl d:ItemsSource="{d:SampleData ItemCount=4}" ItemsSource="{Binding OutBlockDatas}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel>
+                                                        <Label Content="{Binding DescName}" />
+                                                        <DataGrid
+                                                            MaxHeight="300"
+                                                            CanUserAddRows="False"
+                                                            CanUserDeleteRows="False"
+                                                            CanUserReorderColumns="False"
+                                                            CanUserResizeRows="False"
+                                                            CanUserSortColumns="False"
+                                                            HorizontalScrollBarVisibility="Visible"
+                                                            IsReadOnly="True"
+                                                            ItemsSource="{Binding BlockDatas}"
+                                                            ScrollViewer.HorizontalScrollBarVisibility="Visible"
+                                                            SelectionMode="Single"
+                                                            SelectionUnit="Cell"
+                                                            Tag="{Binding DataContext, ElementName=root}">
+                                                            <DataGrid.ContextMenu>
+                                                                <ContextMenu>
+                                                                    <MenuItem
+                                                                        Command="{Binding PlacementTarget.Tag.DataCopyCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                        CommandParameter="{Binding}"
+                                                                        Header="데이터 복사" />
+                                                                </ContextMenu>
+                                                            </DataGrid.ContextMenu>
+                                                        </DataGrid>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                    <GridSplitter
+                                        Grid.Row="1"
+                                        Height="4"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Center"
+                                        Background="LightGray" />
+                                    <Controls:BindableAvalonEditor
+                                        Grid.Row="2"
+                                        Margin="0,3,0,0"
+                                        BorderBrush="Gray"
+                                        BorderThickness="1"
+                                        FontFamily="Consolas"
+                                        IsReadOnly="True"
+                                        SyntaxHighlighting="C#"
+                                        Text="{Binding EquipText}">
+                                        <Controls:BindableAvalonEditor.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Command="ApplicationCommands.Copy" Header="복사" />
+                                                <Separator />
+                                                <MenuItem Command="ApplicationCommands.SelectAll" Header="모두 선택" />
+                                            </ContextMenu>
+                                        </Controls:BindableAvalonEditor.ContextMenu>
+                                    </Controls:BindableAvalonEditor>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                        <GridSplitter
+                            Grid.Column="1"
+                            Width="4"
+                            HorizontalAlignment="Center"
+                            Background="White" />
+                        <Grid Grid.Column="2">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <TextBlock
+                                Grid.Row="0"
+                                Padding="10,5,0,0"
+                                VerticalAlignment="Center"
+                                Text="테스트 베드">
+                                <TextBlock.Background>
+                                    <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                                        <GradientStop Offset="1" Color="#FFF9F7F7" />
+                                        <GradientStop Offset="0" Color="White" />
+                                        <GradientStop Offset="0.517" Color="#FFCAC8C8" />
+                                    </LinearGradientBrush>
+                                </TextBlock.Background>
+                            </TextBlock>
+                            <Grid Grid.Row="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="240" MinHeight="220" />
+                                    <RowDefinition Height="4" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <GroupBox Grid.Row="0" Header="요청">
+                                    <Grid>
+                                        <StackPanel>
+                                            <Grid>
+                                                <Label Content="path" />
+                                                <TextBox
+                                                    Margin="60,0,0,0"
+                                                    VerticalAlignment="Center"
+                                                    Text="{Binding Req_path}" />
+                                            </Grid>
+                                            <Grid>
+                                                <Label Content="tr__cd" />
+                                                <TextBox
+                                                    Margin="60,0,0,0"
+                                                    VerticalAlignment="Center"
+                                                    Text="{Binding Req_tr_cd}" />
+                                            </Grid>
+                                            <Grid>
+                                                <Label Content="tr__cont" />
+                                                <TextBox
+                                                    Margin="60,0,0,0"
+                                                    VerticalAlignment="Center"
+                                                    Text="{Binding Req_tr_cont}" />
+                                            </Grid>
+                                            <Grid>
+                                                <Label Content="tr__cont__key" />
+                                                <TextBox
+                                                    Margin="70,0,0,0"
+                                                    VerticalAlignment="Center"
+                                                    Text="{Binding Req_tr_cont_key}" />
+                                            </Grid>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Label Content="Body" />
+                                                <CheckBox
+                                                    x:Name="checkRequestWordWrap"
+                                                    Margin="10,0,0,0"
+                                                    VerticalAlignment="Center"
+                                                    Content="wrapping"
+                                                    IsChecked="True" />
+                                                <Button
+                                                    Width="60"
+                                                    Height="24"
+                                                    Margin="10,0,0,0"
+                                                    Command="{Binding QueryRequestCommand}"
+                                                    Content="전문요청" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                        <TextBox
+                                            Margin="0,135,0,0"
+                                            AcceptsReturn="True"
+                                            HorizontalScrollBarVisibility="Auto"
+                                            Text="{Binding Req_JsonText}"
+                                            VerticalScrollBarVisibility="Auto">
+                                            <TextBox.Style>
+                                                <Style TargetType="{x:Type TextBox}">
+                                                    <Setter Property="TextWrapping" Value="Wrap" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding ElementName=checkRequestWordWrap, Path=IsChecked}" Value="True">
+                                                            <Setter Property="TextWrapping" Value="Wrap" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding ElementName=checkRequestWordWrap, Path=IsChecked}" Value="False">
+                                                            <Setter Property="TextWrapping" Value="NoWrap" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBox.Style>
+
+                                        </TextBox>
+                                    </Grid>
+                                </GroupBox>
+                                <GridSplitter
+                                    Grid.Row="1"
+                                    Height="4"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Center"
+                                    Background="White" />
+                                <GroupBox Grid.Row="2" Header="응답">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="22" />
+                                        </Grid.RowDefinitions>
+                                        <Grid Grid.Row="0">
+                                            <StackPanel>
+                                                <Grid>
+                                                    <Label Content="tr__cd" />
+                                                    <TextBox
+                                                        Margin="60,0,0,0"
+                                                        VerticalAlignment="Center"
+                                                        IsReadOnly="True"
+                                                        Text="{Binding Res_tr_cd}" />
+                                                </Grid>
+                                                <Grid>
+                                                    <Label Content="tr__cont" />
+                                                    <TextBox
+                                                        Margin="60,0,0,0"
+                                                        VerticalAlignment="Center"
+                                                        IsReadOnly="True"
+                                                        Text="{Binding Res_tr_cont}" />
+                                                </Grid>
+                                                <Grid>
+                                                    <Label Content="tr__cont__key" />
+                                                    <TextBox
+                                                        Margin="70,0,0,0"
+                                                        VerticalAlignment="Center"
+                                                        IsReadOnly="True"
+                                                        Text="{Binding Res_tr_cont_key}" />
+                                                </Grid>
+                                                <Grid>
+                                                    <Label Content="Body" />
+                                                    <CheckBox
+                                                        x:Name="checkResponseWordWrap"
+                                                        Margin="60,0,0,0"
+                                                        VerticalAlignment="Center"
+                                                        Content="wrapping"
+                                                        IsChecked="True" />
+                                                </Grid>
+                                            </StackPanel>
+                                            <TextBox
+                                                Margin="0,105,0,0"
+                                                AcceptsReturn="True"
+                                                HorizontalScrollBarVisibility="Auto"
+                                                IsReadOnly="True"
+                                                Text="{Binding Res_JsonText}"
+                                                VerticalScrollBarVisibility="Auto">
+                                                <TextBox.Style>
+                                                    <Style TargetType="{x:Type TextBox}">
+                                                        <Setter Property="TextWrapping" Value="Wrap" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding ElementName=checkResponseWordWrap, Path=IsChecked}" Value="True">
+                                                                <Setter Property="TextWrapping" Value="Wrap" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding ElementName=checkResponseWordWrap, Path=IsChecked}" Value="False">
+                                                                <Setter Property="TextWrapping" Value="NoWrap" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBox.Style>
+                                            </TextBox>
+                                        </Grid>
+                                        <Grid Grid.Row="1">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock
+                                                Grid.Column="0"
+                                                VerticalAlignment="Bottom"
+                                                Text="{Binding Req_Time}" />
+                                            <TextBlock
+                                                Grid.Column="1"
+                                                VerticalAlignment="Bottom"
+                                                Text="{Binding Res_Time}" />
+                                        </Grid>
+                                    </Grid>
+                                </GroupBox>
+                            </Grid>
                         </Grid>
                     </Grid>
                     <GridSplitter
-                        Grid.Column="1"
-                        Width="4"
-                        HorizontalAlignment="Center"
+                        Grid.Row="1"
+                        Height="4"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Center"
                         Background="White" />
-                    <Grid Grid.Column="2">
-                        <GroupBox Header="요청">
-                            <StackPanel>
-                                <Grid>
-                                    <Label Content="path" />
-                                    <TextBox
-                                        Margin="60,0,0,0"
-                                        VerticalAlignment="Center"
-                                        IsReadOnly="True"
-                                        Text="{Binding Req_path}" />
-                                </Grid>
-                                <Grid>
-                                    <Label Content="tr__cd" />
-                                    <TextBox
-                                        Margin="60,0,0,0"
-                                        VerticalAlignment="Center"
-                                        IsReadOnly="True"
-                                        Text="{Binding Req_tr_cd}" />
-                                </Grid>
-                                <Grid>
-                                    <Label Content="tr__cont" />
-                                    <TextBox
-                                        Margin="60,0,0,0"
-                                        VerticalAlignment="Center"
-                                        IsReadOnly="True"
-                                        Text="{Binding Req_tr_cont}" />
-                                </Grid>
-                                <Grid>
-                                    <Label Content="tr__cont__key" />
-                                    <TextBox
-                                        Margin="70,0,0,0"
-                                        VerticalAlignment="Center"
-                                        IsReadOnly="True"
-                                        Text="{Binding Req_tr_cont_key}" />
-                                </Grid>
-                                <StackPanel Orientation="Horizontal">
-                                    <Label Content="Body" />
-                                    <CheckBox
-                                        x:Name="checkRequestWordWrap"
-                                        Margin="10,0,0,0"
-                                        VerticalAlignment="Center"
-                                        Content="wrapping"
-                                        IsChecked="True" />
-                                </StackPanel>
-                                <TextBox
-                                    Height="100"
-                                    AcceptsReturn="True"
-                                    IsReadOnly="True"
-                                    Text="{Binding RequestText}"
-                                    VerticalScrollBarVisibility="Auto">
-                                    <TextBox.Style>
-                                        <Style TargetType="{x:Type TextBox}">
-                                            <Setter Property="TextWrapping" Value="Wrap" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding ElementName=checkRequestWordWrap, Path=IsChecked}" Value="True">
-                                                    <Setter Property="TextWrapping" Value="Wrap" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding ElementName=checkRequestWordWrap, Path=IsChecked}" Value="False">
-                                                    <Setter Property="TextWrapping" Value="NoWrap" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBox.Style>
+                    <Controls:LogsView
+                        Grid.Row="2"
+                        DoubleClickedItem="{Binding DoubleClickedItem, Mode=OneWayToSource}"
+                        ItemsSource="{Binding TabListDatas}"
+                        SelectedItem="{Binding SelectedTabListData}"
+                        SelectedListItem="{Binding SelectedLogListItem, Mode=OneWayToSource}"
+                        TabStripPlacement="Bottom">
+                        <Controls:LogsView.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Command="{Binding Logs_Menu_CopyCommand}" Header="복사" />
+                                <MenuItem Command="{Binding Logs_Menu_ClearCommand}" Header="지우기" />
+                                <Separator />
+                                <MenuItem Command="{Binding Logs_Menu_AllClearCommand}" Header="전체 탭 지우기" />
+                                <Separator Height="5" />
+                                <MenuItem Command="{Binding Logs_Menu_RemoveBroadCommand}" Header="실시간 중지" />
+                            </ContextMenu>
+                        </Controls:LogsView.ContextMenu>
 
-                                </TextBox>
-                            </StackPanel>
-                        </GroupBox>
-                        <GroupBox Margin="0,260,0,0" Header="응답">
-                            <Grid>
-                                <StackPanel>
-                                    <Grid>
-                                        <Label Content="tr__cd" />
-                                        <TextBox
-                                            Margin="60,0,0,0"
-                                            VerticalAlignment="Center"
-                                            IsReadOnly="True"
-                                            Text="{Binding Res_tr_cd}" />
-                                    </Grid>
-                                    <Grid>
-                                        <Label Content="tr__cont" />
-                                        <TextBox
-                                            Margin="60,0,0,0"
-                                            VerticalAlignment="Center"
-                                            IsReadOnly="True"
-                                            Text="{Binding Res_tr_cont}" />
-                                    </Grid>
-                                    <Grid>
-                                        <Label Content="tr__cont__key" />
-                                        <TextBox
-                                            Margin="70,0,0,0"
-                                            VerticalAlignment="Center"
-                                            IsReadOnly="True"
-                                            Text="{Binding Res_tr_cont_key}" />
-                                    </Grid>
-                                    <Grid>
-                                        <Label Content="Body" />
-                                        <CheckBox
-                                            x:Name="checkResponseWordWrap"
-                                            Margin="60,0,0,0"
-                                            VerticalAlignment="Center"
-                                            Content="wrapping"
-                                            IsChecked="True" />
-                                    </Grid>
-                                </StackPanel>
-                                <TextBox
-                                    Margin="0,105,0,0"
-                                    AcceptsReturn="True"
-                                    HorizontalScrollBarVisibility="Auto"
-                                    IsReadOnly="True"
-                                    Text="{Binding ResponseText}"
-                                    VerticalScrollBarVisibility="Auto">
-                                    <TextBox.Style>
-                                        <Style TargetType="{x:Type TextBox}">
-                                            <Setter Property="TextWrapping" Value="Wrap" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding ElementName=checkResponseWordWrap, Path=IsChecked}" Value="True">
-                                                    <Setter Property="TextWrapping" Value="Wrap" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding ElementName=checkResponseWordWrap, Path=IsChecked}" Value="False">
-                                                    <Setter Property="TextWrapping" Value="NoWrap" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBox.Style>
-                                </TextBox>
-                            </Grid>
-
-                        </GroupBox>
-                    </Grid>
+                    </Controls:LogsView>
+                    <!--<ContentControl Content="{Binding UserContent}" Visibility="{Binding IsUserContentVisibled, Converter={StaticResource BooleanToVisibilityConverter}}" />-->
                 </Grid>
-                <GridSplitter
-                    Grid.Row="1"
-                    Height="4"
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Center"
-                    Background="White" />
-                <Controls:LogsView
-                    Grid.Row="2"
-                    DoubleClickedItem="{Binding DoubleClickedItem, Mode=OneWayToSource}"
-                    ItemsSource="{Binding TabListDatas}"
-                    SelectedItem="{Binding SelectedTabListData}"
-                    SelectedListItem="{Binding SelectedLogListItem, Mode=OneWayToSource}"
-                    TabStripPlacement="Bottom">
-                    <Controls:LogsView.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Command="{Binding Logs_Menu_CopyCommand}" Header="복사" />
-                            <MenuItem Command="{Binding Logs_Menu_ClearCommand}" Header="지우기" />
-                            <Separator />
-                            <MenuItem Command="{Binding Logs_Menu_AllClearCommand}" Header="전체 탭 지우기" />
-                            <Separator Height="5" />
-                            <MenuItem Command="{Binding Logs_Menu_RemoveBroadCommand}" Header="실시간 중지" />
-                        </ContextMenu>
-                    </Controls:LogsView.ContextMenu>
-
-                </Controls:LogsView>
-                <!--<ContentControl Content="{Binding UserContent}" Visibility="{Binding IsUserContentVisibled, Converter={StaticResource BooleanToVisibilityConverter}}" />-->
             </Grid>
         </Grid>
         <StatusBar

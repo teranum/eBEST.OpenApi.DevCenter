@@ -1,6 +1,6 @@
 ﻿namespace eBEST.OpenApi.DevCenter.Models
 {
-    public class IdTextItem : IdText
+    internal class IdTextItem : IdText
     {
         public IdTextItem(int id, string name) : base(id, name)
         {

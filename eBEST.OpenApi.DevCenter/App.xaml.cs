@@ -1,8 +1,6 @@
 ﻿using App.Helpers;
-using CommunityToolkit.Mvvm.DependencyInjection;
 using eBEST.OpenApi.DevCenter.ViewModels;
 using eBEST.OpenApi.DevCenter.Views;
-using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
 using System.Windows.Input;
 
@@ -15,16 +13,6 @@ namespace eBEST.OpenApi.DevCenter
     {
         public App()
         {
-            Ioc.Default.ConfigureServices(
-                new ServiceCollection()
-
-                //Services
-                .AddSingleton<IAppRegistry>(new AppRegistry("teranum"))
-                .AddSingleton<MainViewModel>()
-
-                .BuildServiceProvider()
-                );
-
             Startup += (sender, args) =>
             {
                 var mainView = new MainView();
@@ -33,7 +21,7 @@ namespace eBEST.OpenApi.DevCenter
                     if (e.ChangedButton == MouseButton.Left)
                         mainView.DragMove();
                 };
-                mainView.DataContext = Ioc.Default.GetRequiredService<MainViewModel>();
+                mainView.DataContext = new MainViewModel(new AppRegistry("teranum"));
                 mainView.Show();
             };
         }

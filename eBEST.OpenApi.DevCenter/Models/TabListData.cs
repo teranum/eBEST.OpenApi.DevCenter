@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 
 namespace eBEST.OpenApi.DevCenter.Models
 {
-    public partial class TabListData : ObservableObject
+    internal partial class TabListData : ObservableObject
     {
         [ObservableProperty]
         int _Id;

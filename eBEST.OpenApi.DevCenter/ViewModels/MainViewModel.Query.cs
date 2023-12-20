@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
+using System.Windows;
 
 namespace eBEST.OpenApi.DevCenter.ViewModels;
 
@@ -16,9 +17,13 @@ internal partial class MainViewModel
     [ObservableProperty] string _req_tr_cd = string.Empty;
     [ObservableProperty] string _req_tr_cont = string.Empty;
     [ObservableProperty] string _req_tr_cont_key = string.Empty;
+    [ObservableProperty] string _req_JsonText = string.Empty;
+    [ObservableProperty] string _req_Time = "요청시간 : ";
     [ObservableProperty] string _res_tr_cd = string.Empty;
     [ObservableProperty] string _res_tr_cont = string.Empty;
     [ObservableProperty] string _res_tr_cont_key = string.Empty;
+    [ObservableProperty] string _res_JsonText = string.Empty;
+    [ObservableProperty] string _res_Time = "응답시간 : ";
 
     private string _save_tr_cont = string.Empty;
     private string _save_tr_cont_key = string.Empty;
@@ -165,22 +170,25 @@ internal partial class MainViewModel
         string path = pathAttribute.Path;
         string tr_code = pathAttribute.TRCode.Length > 0 ? pathAttribute.TRCode : _selectedPanelType.Name;
 
-        Stopwatch timer = Stopwatch.StartNew();
-        (string out_tr_cd, string out_tr_cont, string out_tr_cont_key, string jsonResponse) = await _openApi.GetDataWithJsonString(path, tr_code, tr_cont, tr_cont_key, jsonbody).ConfigureAwait(true);
-        timer.Stop();
+        OutputLog(LogKind.LOGS, $"TR 요청 : {tr_code}, {pathAttribute.Description}");
+        Req_Time = $"요청시간 : {DateTime.Now.ToString("HH:mm:ss.fff")}";
 
-        OutputLog(LogKind.LOGS, $"{_selectedPanelType.Name} TR 요청 완료: time(ms) = {timer.Elapsed.TotalMilliseconds}");
+        (string out_tr_cd, string out_tr_cont, string out_tr_cont_key, string jsonResponse) = await _openApi.GetDataWithJsonString(path, tr_code, tr_cont, tr_cont_key, jsonbody).ConfigureAwait(true);
+
+        Res_Time = $"응답시간 : {DateTime.Now.ToString("HH:mm:ss.fff")}";
+        
+
         OutputLog(LogKind.최근조회TR, $"{_selectedPanelType.Name} : {pathAttribute.Description}");
 
-        RequestText = jsonbody;
-        ResponseText = jsonResponse;
         Req_path = path;
         Req_tr_cd = tr_code;
         Req_tr_cont = tr_cont;
         Req_tr_cont_key = tr_cont_key;
+        Req_JsonText = jsonbody;
         Res_tr_cd = out_tr_cd;
         Res_tr_cont = out_tr_cont;
         Res_tr_cont_key = out_tr_cont_key;
+        Res_JsonText = jsonResponse;
 
         _save_tr_cont = out_tr_cont;
         _save_tr_cont_key = out_tr_cont_key;
@@ -213,7 +221,36 @@ internal partial class MainViewModel
         OutBlockDatas = newOutBlockDatas;
     }
 
+    [RelayCommand]
+    async Task QueryRequestAsync()
+    {
+        // 요청 데이터로 직접 TR 요청
+        if (!_openApi.Connected)
+        {
+            OutputLog(LogKind.LOGS, "로그인 후 사용하세요");
+            return;
+        }
 
+        // 입력 파라메터 간단 검사
+        if (Req_path.Length == 0 || Req_tr_cd.Length == 0)
+        {
+            OutputLog(LogKind.LOGS, "path, tr_cd 는 필수 입력입니다.");
+            return;
+        }
+
+        OutputLog(LogKind.LOGS, $"전문 요청 : path={Req_path}, tr_cd={Req_tr_cd}");
+
+        Req_Time = $"요청시간 : {DateTime.Now.ToString("HH:mm:ss.fff")}";
+
+        (Res_tr_cd, Res_tr_cont, Res_tr_cont_key, Res_JsonText) = await _openApi.GetDataWithJsonString(Req_path, Req_tr_cd, Req_tr_cont, Req_tr_cont_key, Req_JsonText).ConfigureAwait(true);
+
+        Res_Time = $"응답시간 : {DateTime.Now.ToString("HH:mm:ss.fff")}";
+
+        if (_modelClasses.TryGetValue(Req_tr_cd, out var modelClass))
+        {
+            SelectPanelType(modelClass);
+        }
+    }
 
     void MakeEquipText()
     {
@@ -430,6 +467,69 @@ internal partial class MainViewModel
         EquipText = sb.ToString();
 
 
+    }
+
+    void LoadToolsData()
+    {
+        string section = "TestBed";
+        Req_path = _appRegistry.GetValue(section, "path", "/indtp/market-data");
+        Req_tr_cd = _appRegistry.GetValue(section, "tr_cd", "t8424");
+        Req_tr_cont = "N";
+        string defaultJsonText = "{\r\n  \"t8424InBlock\": {\r\n    \"gubun1\": \"1\"\r\n  }\r\n}";
+        Req_JsonText = _appRegistry.GetValue(section, "JsonText", defaultJsonText);
+
+        if (Req_JsonText.Equals(defaultJsonText))
+        {
+            // 처음으로 앱을 작동 시켰다면
+            _appRegistry.SetValue("t8424InBlock", "gubun1", "1");
+        }
+
+        if (_modelClasses.TryGetValue(Req_tr_cd, out var modelClass))
+        {
+            SelectPanelType(modelClass);
+        }
+    }
+
+    void SaveToolsData()
+    {
+        string section = "TestBed";
+        _appRegistry.SetValue(section, "path", Req_path);
+        _appRegistry.SetValue(section, "tr_cd", Req_tr_cd);
+        _appRegistry.SetValue(section, "JsonText", Req_JsonText);
+    }
+
+    [RelayCommand]
+    void DataCopy(object block)
+    {
+        if (block is BlockRecord blockRecord)
+        {
+            var datas = blockRecord.BlockDatas;
+            StringBuilder stringBuilder = new();
+            stringBuilder.AppendLine($";{blockRecord.Name}");
+            if (datas.Count > 0)
+            {
+                var properties = datas[0].GetType().GetProperties();
+                stringBuilder.Append(';');
+                foreach (var prop in properties)
+                {
+                    stringBuilder.Append($"{prop.Name}\t");
+                }
+                stringBuilder.AppendLine();
+                foreach (var data in datas)
+                {
+                    foreach (var prop in properties)
+                    {
+                        var value = prop.GetValue(data);
+                        if (value != null)
+                        {
+                            stringBuilder.Append($"{value}\t");
+                        }
+                    }
+                    stringBuilder.AppendLine();
+                }
+            }
+            Clipboard.SetText(stringBuilder.ToString());
+        }
     }
 }
 

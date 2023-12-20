@@ -63,7 +63,7 @@ internal partial class MainViewModel
                 }
             }
         }
-        OutputLog(LogKind.OnRealData, $"TrCode={e.TrCode}, Key={e.Key}, {e.RealtimeBody}");
+        OutputLog(LogKind.실시간시세응답, $"TrCode={e.TrCode}, Key={e.Key}, {e.RealtimeBody}");
     }
 
     private void OpenApi_OnMessageEvent(object? sender, EBestOnMessageEventArgs e)

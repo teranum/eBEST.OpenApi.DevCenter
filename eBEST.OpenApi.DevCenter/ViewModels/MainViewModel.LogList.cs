@@ -64,7 +64,7 @@ internal partial class MainViewModel
     // 리스트 더블클릭 : 최근조회TR
     private void ListBox_MouseDoubleClick(string Text)
     {
-        if (SelectedTabListData != null && SelectedTabListData.Name.Equals("최근조회TR"))
+        if (SelectedTabListData != null && SelectedTabListData.Name.Equals(nameof(LogKind.최근조회TR)))
         {
             var vals = Text.Split(':', StringSplitOptions.RemoveEmptyEntries);
             if (vals.Length > 2)
@@ -137,11 +137,11 @@ internal partial class MainViewModel
     [RelayCommand]
     void Logs_Menu_RemoveBroad()
     {
-        if (_openApi.Connected == false)
+        if (!_openApi.Connected)
         {
             return;
         }
-        if (SelectedTabListData != null && SelectedTabListData.Name.Equals("OnRealData"))
+        if (SelectedTabListData != null && SelectedTabListData.Name.Equals(nameof(LogKind.실시간시세응답)))
         {
             if (SelectedLogListItem != null)
             {

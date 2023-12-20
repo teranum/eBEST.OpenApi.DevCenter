@@ -3,9 +3,9 @@
     internal enum LogKind
     {
         LOGS,
-        OnRealData,
-        실시간계좌응답,
         OnMessage,
+        실시간시세응답,
+        실시간계좌응답,
         최근조회TR,
     }
 }

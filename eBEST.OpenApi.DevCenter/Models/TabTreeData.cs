@@ -2,7 +2,7 @@
 
 namespace eBEST.OpenApi.DevCenter.Models
 {
-    public partial class TabTreeData : ObservableObject
+    internal partial class TabTreeData : ObservableObject
     {
         public int Id { get; set; }
         public string Name { get; set; }

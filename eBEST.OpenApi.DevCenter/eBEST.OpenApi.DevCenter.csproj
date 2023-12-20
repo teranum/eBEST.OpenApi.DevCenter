@@ -18,9 +18,9 @@
 
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="*" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="*" />
 		<PackageReference Include="AvalonEdit" Version="*" />
-		<PackageReference Include="eBEST.OpenApi.Models" Version="1.2.0" />
+		<PackageReference Include="eBEST.OpenApi" Version="*" />
+		<PackageReference Include="eBEST.OpenApi.Models" Version="*" />
 	</ItemGroup>
 
 	<ItemGroup>

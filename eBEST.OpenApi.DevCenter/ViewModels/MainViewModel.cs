@@ -19,8 +19,6 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
         [ObservableProperty] GridLength _tabListHeight;
         [ObservableProperty] GridLength _propertyWidth;
 
-        [ObservableProperty] string _requestText = "";
-        [ObservableProperty] string _responseText = "";
         [ObservableProperty] string _equipText = "";
         [ObservableProperty] int _equipHeight = 220;
 
@@ -43,6 +41,7 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
             int Top = _appRegistry.GetValue(session, "Top", 0);
             int Width = _appRegistry.GetValue(session, "Width", 1250);
             int Height = _appRegistry.GetValue(session, "Height", 760);
+            bool TopMost = _appRegistry.GetValue(session, "TopMost", 0) != 0;
 
             TabTreeWidth = new(_appRegistry.GetValue(session, nameof(TabTreeWidth), 410));
             TabListHeight = new(_appRegistry.GetValue(session, nameof(TabListHeight), 150));
@@ -52,6 +51,7 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
             if (Top != 0) _mainWindow.Top = Top;
             if (Width != 0) _mainWindow.Width = Width;
             if (Height != 0) _mainWindow.Height = Height;
+            _mainWindow.Topmost = TopMost;
 
             _mainWindow.Closed += (s, e) =>
             {
@@ -59,12 +59,13 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
                 _appRegistry.SetValue(session, "Top", (int)_mainWindow.Top);
                 _appRegistry.SetValue(session, "Width", (int)_mainWindow.Width);
                 _appRegistry.SetValue(session, "Height", (int)_mainWindow.Height);
+                _appRegistry.SetValue(session, "TopMost", _mainWindow.Topmost ? 1 : 0);
 
                 _appRegistry.SetValue(session, nameof(TabTreeWidth), (int)TabTreeWidth.Value);
                 _appRegistry.SetValue(session, nameof(TabListHeight), (int)TabListHeight.Value);
                 _appRegistry.SetValue(session, nameof(PropertyWidth), (int)PropertyWidth.Value);
 
-                //SaveToolsData();
+                SaveToolsData();
             };
 
             // 로그 리스트 설정
@@ -91,6 +92,8 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
 
 
             LoadTrDatas();
+
+            LoadToolsData();
         }
 
         // OpenApi.Models reference 용으로 사용
