@@ -14,7 +14,6 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
 {
     internal partial class MainViewModel : ObservableObject
     {
-        private const string GITHUP_RELEASE_URL = "https://api.github.com/repos/teranum/eBEST.OpenApi.DevCenter/releases";
         private readonly string _appVersion;
         private List<GithubTagInfo>? _releaseTags;
 
@@ -129,38 +128,6 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
                     StatusText = $"새로운 버전({lastTag.tag_name})이 있습니다.";
                 }
             }
-
-            //HttpClient client = new();
-
-            //using HttpRequestMessage httpRequestMessage = new(HttpMethod.Get, "https://api.github.com/repos/teranum/eBEST.OpenApi.DevCenter/releases/latest");
-            //httpRequestMessage.Headers.Add("User-Agent", "eBEST DevCenter");
-
-            //var response = await client.SendAsync(httpRequestMessage).ConfigureAwait(true);
-            //if (response != null && response.IsSuccessStatusCode)
-            //{
-            //    string result = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
-            //    if (result != null)
-            //    {
-            //        var json = JsonSerializer.Deserialize<Dictionary<string, object>>(result);
-            //        if (json != null)
-            //        {
-            //            string tagName = json["tag_name"]?.ToString() ?? string.Empty;
-            //            string version = tagName.Replace("v", "");
-            //            if (version.Length > 0)
-            //            {
-            //                if (string.Equals(version, _appVersion))
-            //                {
-            //                    StatusText = "최신 버전입니다.";
-            //                }
-            //                else
-            //                {
-            //                    StatusUrl = json["html_url"]?.ToString() ?? string.Empty;
-            //                    StatusText = $"새로운 버전({version})이 있습니다.";
-            //                }
-            //            }
-            //        }
-            //    }
-            //}
         }
 
         [RelayCommand]
