@@ -39,7 +39,7 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
         public MainViewModel(IAppRegistry appRegistry)
         {
             var assemblyName = Application.ResourceAssembly.GetName();
-            _appVersion = $"{assemblyName.Version!.Major}.{assemblyName.Version.Minor}.{assemblyName.Version.Build}";
+            _appVersion = $"{assemblyName.Version!.Major}.{assemblyName.Version.Minor}";
             _title = $"{assemblyName.Name} v{_appVersion}";
 
             _appRegistry = appRegistry;
