@@ -103,8 +103,12 @@ internal partial class MainViewModel
                 rd = param_value;
             }
 
+            bool isAccount = pathAttribute != null && pathAttribute.Key.Equals("account");
             Stopwatch rd_timer = Stopwatch.StartNew();
-            await _openApi.AddRealtimeRequest(trCode, rd).ConfigureAwait(true);
+            if (isAccount)
+                await _openApi.AddAccountRealtimeRequest(trCode).ConfigureAwait(true);
+            else
+                await _openApi.AddRealtimeRequest(trCode, rd).ConfigureAwait(true);
             rd_timer.Stop();
             OutputLog(LogKind.LOGS, $"{_selectedPanelType.Name} 실시간 시세 요청 완료: time(ms) = {rd_timer.Elapsed.TotalMilliseconds}");
             return;
@@ -266,7 +270,7 @@ internal partial class MainViewModel
             if (pathAttribute.Key.Equals("account"))
             {
                 sb_wss.AppendLine($"// [실시간 계좌응답 요청] {trName} : {pathAttribute.Description}");
-                sb_wss.AppendLine($"_openApi.AddAccountRealtimeRequest(\"{trName}\", \"\");");
+                sb_wss.AppendLine($"_openApi.AddAccountRealtimeRequest(\"{trName}\");");
             }
             else
             {
