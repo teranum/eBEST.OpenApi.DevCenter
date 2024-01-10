@@ -58,6 +58,9 @@
                                 </Style>
                             </MenuItem.ItemContainerStyle>
                         </MenuItem>
+                        <MenuItem Header="About">
+                            <MenuItem Command="{Binding Menu_VersionCommand}" Header="버젼정보" />
+                        </MenuItem>
                         <Menu.Background>
                             <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
                                 <GradientStop Offset="1" Color="#FFF9F7F7" />
@@ -469,6 +472,17 @@
             VerticalAlignment="Bottom"
             Background="#FF0C4B73">
             <TextBlock Foreground="White" Text="{Binding StatusText}" />
+            <TextBlock Margin="10,0,0,0">
+                <Hyperlink
+                    Command="{Binding Hyperlink_RequestNavigateCommand}"
+                    CommandParameter="{Binding NavigateUri, RelativeSource={RelativeSource Self}}"
+                    Foreground="White"
+                    NavigateUri="{Binding StatusUrl}">
+                    <Hyperlink.Inlines>
+                        <Run Text="{Binding StatusUrl}" />
+                    </Hyperlink.Inlines>
+                </Hyperlink>
+            </TextBlock>
         </StatusBar>
     </Grid>
 </Window>

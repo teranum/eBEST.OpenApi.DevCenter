@@ -48,7 +48,7 @@ internal partial class MainViewModel
 
         if (!_openApi.Connected)
         {
-            OutputLog(LogKind.LOGS, "로그인 후 사용하세요");
+            OutputLog(LogKind.LOGS, "로그인 후 요청해 주세요");
             return;
         }
 
@@ -171,11 +171,11 @@ internal partial class MainViewModel
         string tr_code = pathAttribute.TRCode.Length > 0 ? pathAttribute.TRCode : _selectedPanelType.Name;
 
         OutputLog(LogKind.LOGS, $"TR 요청 : {tr_code}, {pathAttribute.Description}");
-        Req_Time = $"요청시간 : {DateTime.Now.ToString("HH:mm:ss.fff")}";
+        Req_Time = $"요청시간 : {DateTime.Now:HH:mm:ss.fff}";
 
         (string out_tr_cd, string out_tr_cont, string out_tr_cont_key, string jsonResponse) = await _openApi.GetDataWithJsonString(path, tr_code, tr_cont, tr_cont_key, jsonbody).ConfigureAwait(true);
 
-        Res_Time = $"응답시간 : {DateTime.Now.ToString("HH:mm:ss.fff")}";
+        Res_Time = $"응답시간 : {DateTime.Now:HH:mm:ss.fff}";
 
 
         OutputLog(LogKind.최근조회TR, $"{_selectedPanelType.Name} : {pathAttribute.Description}");
@@ -227,7 +227,7 @@ internal partial class MainViewModel
         // 요청 데이터로 직접 TR 요청
         if (!_openApi.Connected)
         {
-            OutputLog(LogKind.LOGS, "로그인 후 사용하세요");
+            OutputLog(LogKind.LOGS, "로그인 후 요청해 주세요");
             return;
         }
 
@@ -240,11 +240,11 @@ internal partial class MainViewModel
 
         OutputLog(LogKind.LOGS, $"전문 요청 : path={Req_path}, tr_cd={Req_tr_cd}");
 
-        Req_Time = $"요청시간 : {DateTime.Now.ToString("HH:mm:ss.fff")}";
+        Req_Time = $"요청시간 : {DateTime.Now:HH:mm:ss.fff}";
 
         (Res_tr_cd, Res_tr_cont, Res_tr_cont_key, Res_JsonText) = await _openApi.GetDataWithJsonString(Req_path, Req_tr_cd, Req_tr_cont, Req_tr_cont_key, Req_JsonText).ConfigureAwait(true);
 
-        Res_Time = $"응답시간 : {DateTime.Now.ToString("HH:mm:ss.fff")}";
+        Res_Time = $"응답시간 : {DateTime.Now:HH:mm:ss.fff}";
 
         if (_modelClasses.TryGetValue(Req_tr_cd, out var modelClass))
         {
@@ -362,7 +362,7 @@ internal partial class MainViewModel
         {
             var bArray = string_values[nInBlockIndex].bArray;
             sb.Append($"\t\t{name_value.Key} = ");
-            if (bArray) sb.Append("[");
+            if (bArray) sb.Append('[');
             sb.Append("new(");
             var inblock_values = string_values[nInBlockIndex].values;
             for (int i = 0; i < inblock_values.Count; i++)
@@ -499,7 +499,7 @@ internal partial class MainViewModel
     }
 
     [RelayCommand]
-    void DataCopy(object block)
+    static void DataCopy(object block)
     {
         if (block is BlockRecord blockRecord)
         {

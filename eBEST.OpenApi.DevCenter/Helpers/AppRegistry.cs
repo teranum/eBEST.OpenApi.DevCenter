@@ -2,8 +2,9 @@
 
 internal interface IAppRegistry
 {
-    public T GetValue<T>(string SectionName, string KeyName, T DefValue);
-    public bool SetValue<T>(string SectionName, string KeyName, T Value);
+    T GetValue<T>(string SectionName, string KeyName, T DefValue);
+    bool SetValue<T>(string SectionName, string KeyName, T Value);
+    void DeleteValue(string SectionName, string KeyName);
 }
 
 internal class AppRegistry : IAppRegistry
@@ -50,10 +51,16 @@ internal class AppRegistry : IAppRegistry
         if (Value is null) return false;
 
         string subKeyName = $"{CorpAssemKey}\\{SectionName}";
-        using (var regkey = CurrentUser.CreateSubKey(subKeyName))
-        {
-            regkey.SetValue(KeyName, Value, Microsoft.Win32.RegistryValueKind.Unknown);
-        }
+        using var regkey = CurrentUser.CreateSubKey(subKeyName);
+        regkey.SetValue(KeyName, Value, Microsoft.Win32.RegistryValueKind.Unknown);
         return true;
+    }
+
+    public void DeleteValue(string SectionName, string KeyName)
+    {
+        string subKeyName = $"{CorpAssemKey}\\{SectionName}";
+        using var regkey = CurrentUser.OpenSubKey(subKeyName);
+        if (regkey is null) return;
+        regkey.DeleteValue(KeyName);
     }
 }

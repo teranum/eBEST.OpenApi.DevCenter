@@ -1,13 +1,8 @@
 ﻿namespace eBEST.OpenApi.DevCenter.Models
 {
-    internal class IdText
+    internal class IdText(int id, string name)
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public IdText(int id, string name)
-        {
-            Id = id;
-            Name = name;
-        }
+        public int Id { get; set; } = id;
+        public string Name { get; set; } = name;
     }
 }

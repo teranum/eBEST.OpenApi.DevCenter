@@ -5,15 +5,25 @@ using eBEST.OpenApi.DevCenter.Helpers;
 using eBEST.OpenApi.DevCenter.Models;
 using eBEST.OpenApi.DevCenter.Views;
 using eBEST.OpenApi.Models;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Windows;
 
 namespace eBEST.OpenApi.DevCenter.ViewModels
 {
     internal partial class MainViewModel : ObservableObject
     {
+        private const string GITHUP_RELEASE_URL = "https://api.github.com/repos/teranum/eBEST.OpenApi.DevCenter/releases";
+        private readonly string _appVersion;
+        private List<GithubTagInfo>? _releaseTags;
 
         [ObservableProperty] string _title = "eBEST OpenApi DevCenter";
         [ObservableProperty] string _statusText = "Ready";
+
+        [ObservableProperty] string _statusUrl = string.Empty;
+        [ObservableProperty] string _statusUrlText = string.Empty;
+
 
         [ObservableProperty] GridLength _tabTreeWidth;
         [ObservableProperty] GridLength _tabListHeight;
@@ -28,6 +38,10 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
 
         public MainViewModel(IAppRegistry appRegistry)
         {
+            var assemblyName = Application.ResourceAssembly.GetName();
+            _appVersion = $"{assemblyName.Version!.Major}.{assemblyName.Version.Minor}.{assemblyName.Version.Build}";
+            _title = $"{assemblyName.Name} v{_appVersion}";
+
             _appRegistry = appRegistry;
             _mainWindow = Application.Current.MainWindow;
             _openApi = new();
@@ -90,10 +104,73 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
                 _blockRecords.Add(record.Name, record);
             }
 
+            _ = CheckVersionAsync();
 
             LoadTrDatas();
 
             LoadToolsData();
+        }
+
+        private async Task CheckVersionAsync()
+        {
+            // 깃헙에서 최신 버전 정보 가져오기
+
+            _releaseTags = await GetGithubRepoTagInfos("teranum", "eBEST.OpenApi.DevCenter").ConfigureAwait(true);
+            if (_releaseTags != null && _releaseTags.Count > 0)
+            {
+                var lastTag = _releaseTags[0];
+                if (string.Equals(lastTag.tag_name, _appVersion))
+                {
+                    StatusText = "최신 버전입니다.";
+                }
+                else
+                {
+                    StatusUrl = lastTag.html_url;
+                    StatusText = $"새로운 버전({lastTag.tag_name})이 있습니다.";
+                }
+            }
+
+            //HttpClient client = new();
+
+            //using HttpRequestMessage httpRequestMessage = new(HttpMethod.Get, "https://api.github.com/repos/teranum/eBEST.OpenApi.DevCenter/releases/latest");
+            //httpRequestMessage.Headers.Add("User-Agent", "eBEST DevCenter");
+
+            //var response = await client.SendAsync(httpRequestMessage).ConfigureAwait(true);
+            //if (response != null && response.IsSuccessStatusCode)
+            //{
+            //    string result = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
+            //    if (result != null)
+            //    {
+            //        var json = JsonSerializer.Deserialize<Dictionary<string, object>>(result);
+            //        if (json != null)
+            //        {
+            //            string tagName = json["tag_name"]?.ToString() ?? string.Empty;
+            //            string version = tagName.Replace("v", "");
+            //            if (version.Length > 0)
+            //            {
+            //                if (string.Equals(version, _appVersion))
+            //                {
+            //                    StatusText = "최신 버전입니다.";
+            //                }
+            //                else
+            //                {
+            //                    StatusUrl = json["html_url"]?.ToString() ?? string.Empty;
+            //                    StatusText = $"새로운 버전({version})이 있습니다.";
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
+        }
+
+        [RelayCommand]
+        static void Hyperlink_RequestNavigate(Uri url)
+        {
+            var sInfo = new System.Diagnostics.ProcessStartInfo(url.AbsoluteUri)
+            {
+                UseShellExecute = true,
+            };
+            System.Diagnostics.Process.Start(sInfo);
         }
 
         // OpenApi.Models reference 용으로 사용
@@ -114,29 +191,61 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
         [RelayCommand(CanExecute = nameof(CanLogin))]
         void MenuLogin()
         {
-            string AppKey = string.Empty;
-            string SecretKey = string.Empty;
-#if DEBUG
-            // 개발용에서는 간편 키보관 허용
-            AppKey = _appRegistry.GetValue("InitData", "AppKey", "");
-            SecretKey = _appRegistry.GetValue("InitData", "SecretKey", "");
-#endif
-            var keyWindow = new AppKey();
-            keyWindow.textAppKey.Text = AppKey;
-            keyWindow.textSecretKey.Text = SecretKey;
+            // 기존 키 로딩
+            string AppKey = _appRegistry.GetValue("InitData", "AppKey", string.Empty);
+            string SecretKey = _appRegistry.GetValue("InitData", "SecretKey", string.Empty);
+            bool IsRememberKey = _appRegistry.GetValue("InitData", "IsRememberKey", DefValue: false);
+
+            var keyWindow = new KeySetting
+            {
+                AppKey = AppKey,
+                SecretKey = SecretKey,
+                IsRememberKey = IsRememberKey,
+            };
+
             if (keyWindow.ShowDialog() == true)
             {
-                AppKey = keyWindow.textAppKey.Text;
-                SecretKey = keyWindow.textSecretKey.Text;
-#if DEBUG
-                // 개발용에서는 간편 키보관 허용
-                _appRegistry.SetValue("InitData", "AppKey", AppKey);
-                _appRegistry.SetValue("InitData", "SecretKey", SecretKey);
-#endif
+                AppKey = keyWindow.AppKey;
+                SecretKey = keyWindow.SecretKey;
+                IsRememberKey = keyWindow.IsRememberKey;
+
+                if (IsRememberKey)
+                {
+                    _appRegistry.SetValue("InitData", "AppKey", AppKey);
+                    _appRegistry.SetValue("InitData", "SecretKey", SecretKey);
+                    _appRegistry.SetValue("InitData", "IsRememberKey", IsRememberKey);
+                }
+                else
+                {
+                    _appRegistry.DeleteValue("InitData", "AppKey");
+                    _appRegistry.DeleteValue("InitData", "SecretKey");
+                    _appRegistry.DeleteValue("InitData", "IsRememberKey");
+                }
                 _ = _openApi.ConnectAsync(AppKey, SecretKey);
             }
         }
-        bool CanLogin() => _openApi.Connected == false;
-        [RelayCommand] void MenuExit() => System.Windows.Application.Current.Shutdown();
+        bool CanLogin() => !_openApi.Connected;
+        [RelayCommand] static void MenuExit() => System.Windows.Application.Current.Shutdown();
+
+        [RelayCommand]
+        void Menu_Version()
+        {
+            // 버젼 정보
+            if (_releaseTags != null && _releaseTags.Count != 0)
+            {
+                var versionView = new VersionView(_releaseTags);
+                versionView.ShowDialog();
+            }
+        }
+
+        static Task<List<GithubTagInfo>?> GetGithubRepoTagInfos(string Username, string Repository)
+        {
+            // 깃헙 릴리즈 태그에서 가져오기
+            HttpClient client = new();
+            var pih = ProductInfoHeaderValue.Parse(Repository);
+            client.DefaultRequestHeaders.UserAgent.Add(pih);
+            return client.GetFromJsonAsync<List<GithubTagInfo>>($"https://api.github.com/repos/{Username}/{Repository}/releases");
+        }
+
     }
 }

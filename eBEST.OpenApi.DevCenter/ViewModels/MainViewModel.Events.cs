@@ -12,6 +12,7 @@ internal partial class MainViewModel
     private readonly JsonSerializerOptions _jsonOptions = new() { NumberHandling = JsonNumberHandling.AllowReadingFromString };
     private void OpenApi_OnConnectEvent(object? sender, EBestOnConnectEventArgs e)
     {
+        StatusUrl = string.Empty;
         if (e.Ok)
         {
             StatusText = "Connected";

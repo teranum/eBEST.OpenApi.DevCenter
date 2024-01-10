@@ -69,7 +69,7 @@ internal partial class MainViewModel
             var vals = Text.Split(':', StringSplitOptions.RemoveEmptyEntries);
             if (vals.Length > 2)
             {
-                string code = vals[vals.Length - 2].Trim();
+                string code = vals[^2].Trim();
                 if (_modelClasses.TryGetValue(code, out var modelClass))
                 {
                     SelectPanelType(modelClass);
@@ -154,7 +154,7 @@ internal partial class MainViewModel
                         int nKeyTextIndex = SelectedLogListItem.IndexOf("Key=");
                         if (nKeyTextIndex != -1)
                         {
-                            string tr_key = SelectedLogListItem.Substring(nKeyTextIndex + "Key=".Length).Split(',')[0].Trim();
+                            string tr_key = SelectedLogListItem[(nKeyTextIndex + "Key=".Length)..].Split(',')[0].Trim();
                             _ = _openApi.RemoveRealtimeRequest(tr_code, tr_key);
                         }
                     }

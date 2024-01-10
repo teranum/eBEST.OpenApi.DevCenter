@@ -1,14 +1,9 @@
 ﻿namespace eBEST.OpenApi.DevCenter.Models
 {
-    internal class IdTextItem : IdText
+    internal class IdTextItem(int id, string name) : IdText(id, name)
     {
-        public IdTextItem(int id, string name) : base(id, name)
-        {
-            Items = new List<IdTextItem>();
-        }
-
         public IdTextItem? Parent;
-        public IList<IdTextItem> Items { get; }
+        public IList<IdTextItem> Items { get; } = new List<IdTextItem>();
         public void AddChild(IdTextItem item)
         {
             item.Parent = this;

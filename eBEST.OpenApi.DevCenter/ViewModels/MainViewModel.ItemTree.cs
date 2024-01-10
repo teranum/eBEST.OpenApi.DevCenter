@@ -260,7 +260,7 @@ internal partial class MainViewModel
             string blockName = prop.PropertyType.Name;
             if (bArray)
             {
-                blockName = blockName.Substring(0, blockName.Length - 2);
+                blockName = blockName[..^2];
             }
             if (_blockRecords.TryGetValue(blockName, out Type? recordType))
             {
@@ -342,7 +342,7 @@ internal partial class MainViewModel
             string blockName = propName;
             if (bArray)
             {
-                blockName = blockName.Substring(0, blockName.Length - 2);
+                blockName = blockName[..^2];
             }
             if (_blockRecords.TryGetValue(blockName, out Type? recordType))
             {
