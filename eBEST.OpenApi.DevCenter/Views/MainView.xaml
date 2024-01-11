@@ -41,6 +41,7 @@
                     <Menu Height="22" VerticalAlignment="Top">
                         <MenuItem Header="파일">
                             <MenuItem Command="{Binding MenuLoginCommand}" Header="OpenApi 접속" />
+                            <MenuItem Command="{Binding MenuMacAddrSettingCommand}" Header="Mac Address 설정" />
                             <Separator />
                             <MenuItem Command="{Binding MenuExitCommand}" Header="끝내기" />
                         </MenuItem>
@@ -185,6 +186,20 @@
                                                                         Header="데이터 복사" />
                                                                 </ContextMenu>
                                                             </DataGrid.ContextMenu>
+                                                            <DataGrid.CellStyle>
+                                                                <Style TargetType="DataGridCell">
+                                                                    <Setter Property="Background">
+                                                                        <Setter.Value>
+                                                                            <SolidColorBrush Color="{StaticResource {x:Static SystemColors.InfoColorKey}}" />
+                                                                        </Setter.Value>
+                                                                    </Setter>
+                                                                    <Setter Property="Foreground">
+                                                                        <Setter.Value>
+                                                                            <SolidColorBrush Color="Black" />
+                                                                        </Setter.Value>
+                                                                    </Setter>
+                                                                </Style>
+                                                            </DataGrid.CellStyle>
                                                         </DataGrid>
                                                     </StackPanel>
                                                 </DataTemplate>
@@ -286,6 +301,7 @@
                                                 <TextBox
                                                     Margin="60,0,0,0"
                                                     VerticalAlignment="Center"
+                                                    Background="{DynamicResource {x:Static SystemColors.InfoBrushKey}}"
                                                     Text="{Binding Req_path}" />
                                             </Grid>
                                             <Grid>
@@ -293,6 +309,7 @@
                                                 <TextBox
                                                     Margin="60,0,0,0"
                                                     VerticalAlignment="Center"
+                                                    Background="{DynamicResource {x:Static SystemColors.InfoBrushKey}}"
                                                     Text="{Binding Req_tr_cd}" />
                                             </Grid>
                                             <Grid>
@@ -300,6 +317,7 @@
                                                 <TextBox
                                                     Margin="60,0,0,0"
                                                     VerticalAlignment="Center"
+                                                    Background="{DynamicResource {x:Static SystemColors.InfoBrushKey}}"
                                                     Text="{Binding Req_tr_cont}" />
                                             </Grid>
                                             <Grid>
@@ -307,6 +325,7 @@
                                                 <TextBox
                                                     Margin="70,0,0,0"
                                                     VerticalAlignment="Center"
+                                                    Background="{DynamicResource {x:Static SystemColors.InfoBrushKey}}"
                                                     Text="{Binding Req_tr_cont_key}" />
                                             </Grid>
                                             <StackPanel Orientation="Horizontal">
@@ -328,6 +347,7 @@
                                         <TextBox
                                             Margin="0,135,0,0"
                                             AcceptsReturn="True"
+                                            Background="{DynamicResource {x:Static SystemColors.InfoBrushKey}}"
                                             HorizontalScrollBarVisibility="Auto"
                                             Text="{Binding Req_JsonText}"
                                             VerticalScrollBarVisibility="Auto">

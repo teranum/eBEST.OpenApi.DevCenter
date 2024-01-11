@@ -194,8 +194,7 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
         bool CanLogin() => !_openApi.Connected;
         [RelayCommand] static void MenuExit() => System.Windows.Application.Current.Shutdown();
 
-        [RelayCommand]
-        void Menu_Version()
+        [RelayCommand] void Menu_Version()
         {
             // 버젼 정보
             if (_releaseTags != null && _releaseTags.Count != 0)
@@ -212,6 +211,22 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
             var pih = ProductInfoHeaderValue.Parse(Repository);
             client.DefaultRequestHeaders.UserAgent.Add(pih);
             return client.GetFromJsonAsync<List<GithubTagInfo>>($"https://api.github.com/repos/{Username}/{Repository}/releases");
+        }
+
+        [RelayCommand] void MenuMacAddrSetting()
+        {
+            // 맥주소 설정
+            var mac_addr_window = new MacAddressInputWindow
+            {
+                PrefixAddress = _openApi.MacAddress,
+                NewAddress = _appRegistry.GetValue("InitData", "MacAddress", string.Empty),
+            };
+            if (mac_addr_window.ShowDialog() == true)
+            {
+                string new_address = mac_addr_window.NewAddress;
+                _openApi.MacAddress = new_address;
+                _appRegistry.SetValue("InitData", "MacAddress", new_address);
+            }
         }
 
     }
