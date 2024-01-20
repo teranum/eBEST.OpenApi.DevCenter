@@ -59,7 +59,7 @@ internal class AppRegistry : IAppRegistry
     public void DeleteValue(string SectionName, string KeyName)
     {
         string subKeyName = $"{CorpAssemKey}\\{SectionName}";
-        using var regkey = CurrentUser.OpenSubKey(subKeyName);
+        using var regkey = CurrentUser.OpenSubKey(subKeyName, writable: true);
         if (regkey is null) return;
         regkey.DeleteValue(KeyName);
     }
