@@ -194,7 +194,8 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
         bool CanLogin() => !_openApi.Connected;
         [RelayCommand] static void MenuExit() => System.Windows.Application.Current.Shutdown();
 
-        [RelayCommand] void Menu_Version()
+        [RelayCommand]
+        void Menu_Version()
         {
             // 버젼 정보
             if (_releaseTags != null && _releaseTags.Count != 0)
@@ -213,7 +214,8 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
             return client.GetFromJsonAsync<List<GithubTagInfo>>($"https://api.github.com/repos/{Username}/{Repository}/releases");
         }
 
-        [RelayCommand] void MenuMacAddrSetting()
+        [RelayCommand]
+        void MenuMacAddrSetting()
         {
             // 맥주소 설정
             var mac_addr_window = new MacAddressInputWindow
@@ -229,5 +231,16 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
             }
         }
 
+        [ObservableProperty] LANG_TYPE _langType = LANG_TYPE.CSHARP;
+        //[RelayCommand]
+        //void MenuModelLanguage(string lang)
+        //{
+        //    //LangType = lang switch
+        //    //{
+        //    //    "C#" => LANG_TYPE.CSHARP,
+        //    //    "Python" => LANG_TYPE.PYTHON,
+        //    //    _ => LANG_TYPE.CSHARP,
+        //    //};
+        //}
     }
 }
