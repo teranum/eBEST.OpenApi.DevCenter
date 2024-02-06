@@ -3,6 +3,8 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:Controls="clr-namespace:eBEST.OpenApi.DevCenter.Controls"
+    xmlns:Converters="clr-namespace:eBEST.OpenApi.DevCenter.Converters"
+    xmlns:Models="clr-namespace:eBEST.OpenApi.DevCenter.Models"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:eBEST.OpenApi.DevCenter.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -17,6 +19,7 @@
         <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="DodgerBlue" />
         <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="White" />
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <Converters:Equal2BooleanConverter x:Key="Equal2BooleanConverter" />
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -51,6 +54,16 @@
                                 IsCheckable="True"
                                 IsChecked="{Binding ElementName=root, Path=Topmost, Mode=TwoWay}" />
                         </MenuItem>
+                        <MenuItem Header="언어">
+                            <MenuItem
+                                Header="C#"
+                                IsCheckable="True"
+                                IsChecked="{Binding LangType, Converter={StaticResource Equal2BooleanConverter}, ConverterParameter={x:Static Models:LANG_TYPE.CSHARP}}" />
+                            <MenuItem
+                                Header="Python"
+                                IsCheckable="True"
+                                IsChecked="{Binding LangType, Converter={StaticResource Equal2BooleanConverter}, ConverterParameter={x:Static Models:LANG_TYPE.PYTHON}}" />
+                        </MenuItem>
                         <MenuItem Header="{Binding MenuCustomizeHeaderText}" ItemsSource="{Binding MenuCustomizeItems}">
                             <MenuItem.ItemContainerStyle>
                                 <Style TargetType="{x:Type MenuItem}">
@@ -58,9 +71,6 @@
                                     <Setter Property="CommandParameter" Value="{Binding Path=Header, RelativeSource={RelativeSource self}}" />
                                 </Style>
                             </MenuItem.ItemContainerStyle>
-                        </MenuItem>
-                        <MenuItem Header="About">
-                            <MenuItem Command="{Binding Menu_VersionCommand}" Header="버젼정보" />
                         </MenuItem>
                         <Menu.Background>
                             <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">

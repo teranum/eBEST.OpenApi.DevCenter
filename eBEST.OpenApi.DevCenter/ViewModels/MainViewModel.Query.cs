@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using eBEST.OpenApi.DevCenter.Models;
 using eBEST.OpenApi.Models;
 using System.Collections;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text;
@@ -266,34 +267,85 @@ internal partial class MainViewModel
         if (pathAttribute.Path.Contains("websocket"))
         {
             StringBuilder sb_wss = new();
+            if (LangType == LANG_TYPE.CSHARP)
+            {
+                if (pathAttribute.Key.Equals("account"))
+                {
+                    sb_wss.AppendLine($"// [실시간 계좌응답 요청] {trName} : {pathAttribute.Description}");
+                    sb_wss.AppendLine($"_openApi.AddAccountRealtimeRequest(\"{trName}\");");
+                }
+                else
+                {
+                    // InBlock 프로퍼티 찾는다
+                    var in_record = InBlockDatas[0].BlockDatas[0];
+                    var inblock_props = in_record.GetType().GetProperties();
+                    if (inblock_props.Length == 0) return;
+                    var inblock_prop_first = inblock_props[0];
+                    var inblock_forst_data = inblock_prop_first.GetValue(in_record);
+                    sb_wss.AppendLine($"// [실시간 시세 요청] {trName} : {pathAttribute.Description}");
+                    sb_wss.AppendLine($"_openApi.AddRealtimeRequest(\"{trName}\", \"{inblock_forst_data}\");");
+                }
+                sb_wss.AppendLine();
+                sb_wss.AppendLine($"// OnRealtimeEvent 이벤트");
+                sb_wss.AppendLine("JsonSerializerOptions _jsonOptions = new() { NumberHandling = JsonNumberHandling.AllowReadingFromString };");
+                sb_wss.AppendLine($"if (e.TrCode.Equals(\"{trName}\"))");
+                sb_wss.AppendLine("{");
+                sb_wss.AppendLine($"\t{trName}OutBlock? outBlockData = JsonSerializer.Deserialize<{trName}OutBlock>(e.RealtimeBody, _jsonOptions);");
+                sb_wss.AppendLine($"\tif (outBlockData is not null)");
+                sb_wss.AppendLine("\t{");
+                sb_wss.AppendLine($"\t\t// {trName}OutBlock 데이터 처리");
+                sb_wss.AppendLine("\t}");
+                sb_wss.AppendLine("}");
+            }
+            else if (LangType == LANG_TYPE.PYTHON)
+            {
+                sb_wss.Append(
+                    $$"""
+                    import asyncio
+                    import ebest
+                    from app_keys import appkey, appsecretkey # app_keys.py 파일에 appkey, appsecretkey 변수를 정의하고 사용하세요
+                    
+                    async def main():
+                        api=ebest.OpenApi()
+                        api.on_realtime = on_realtime # 실시간 이벤트 핸들러 등록
+                        if not await api.login(appkey, appsecretkey): return print(f"연결실패: {api.last_message}")
 
-            if (pathAttribute.Key.Equals("account"))
-            {
-                sb_wss.AppendLine($"// [실시간 계좌응답 요청] {trName} : {pathAttribute.Description}");
-                sb_wss.AppendLine($"_openApi.AddAccountRealtimeRequest(\"{trName}\");");
+                    
+                    """);
+
+                if (pathAttribute.Key.Equals("account"))
+                {
+                    sb_wss.AppendLine($"    # [실시간 계좌응답 요청] {trName} : {pathAttribute.Description}");
+                    sb_wss.AppendLine($"    await api.add_realtime(\"{trName}\", \"\")");
+                }
+                else
+                {
+                    // InBlock 프로퍼티 찾는다
+                    var in_record = InBlockDatas[0].BlockDatas[0];
+                    var inblock_props = in_record.GetType().GetProperties();
+                    if (inblock_props.Length == 0) return;
+                    var inblock_prop_first = inblock_props[0];
+                    var inblock_forst_data = inblock_prop_first.GetValue(in_record);
+                    sb_wss.AppendLine($"    # [실시간 시세 요청] {trName} : {pathAttribute.Description}");
+                    sb_wss.AppendLine($"    await api.add_realtime(\"{trName}\", \"{inblock_forst_data}\")");
+                }
+
+                sb_wss.Append(
+                    $$"""
+                        
+                        ... # 다른 작업 수행
+                        await api.close()
+
+
+                    def on_realtime(api:ebest.OpenApi, trcode, key, realtimedata):
+                        if trcode == "{{trName}}":
+                            print(f"{trcode}: {key}, {realtimedata}")
+
+                    asyncio.run(main())
+                    
+                    """);
             }
-            else
-            {
-                // InBlock 프로퍼티 찾는다
-                var in_record = InBlockDatas[0].BlockDatas[0];
-                var inblock_props = in_record.GetType().GetProperties();
-                if (inblock_props.Length == 0) return;
-                var inblock_prop_first = inblock_props[0];
-                var inblock_forst_data = inblock_prop_first.GetValue(in_record);
-                sb_wss.AppendLine($"// [실시간 시세 요청] {trName} : {pathAttribute.Description}");
-                sb_wss.AppendLine($"_openApi.AddRealtimeRequest(\"{trName}\", \"{inblock_forst_data}\");");
-            }
-            sb_wss.AppendLine();
-            sb_wss.AppendLine($"// OnRealtimeEvent 이벤트");
-            sb_wss.AppendLine("JsonSerializerOptions _jsonOptions = new() { NumberHandling = JsonNumberHandling.AllowReadingFromString };");
-            sb_wss.AppendLine($"if (e.TrCode.Equals(\"{trName}\"))");
-            sb_wss.AppendLine("{");
-            sb_wss.AppendLine($"\t{trName}OutBlock? outBlockData = JsonSerializer.Deserialize<{trName}OutBlock>(e.RealtimeBody, _jsonOptions);");
-            sb_wss.AppendLine($"\tif (outBlockData is not null)");
-            sb_wss.AppendLine("\t{");
-            sb_wss.AppendLine($"\t\t// {trName}OutBlock 데이터 처리");
-            sb_wss.AppendLine("\t}");
-            sb_wss.AppendLine("}");
+
             EquipText = sb_wss.ToString();
 
             return;
@@ -306,7 +358,7 @@ internal partial class MainViewModel
         if (!outBlockProperties.Any()) return;
 
         Dictionary<string, object?> nameValueCollection = [];
-        List<(bool bArray, List<string> values)> string_values = [];
+        List<(bool bArray, List<string> names, List<string> values)> string_values = [];
         foreach (var p in inBlockProperties)
         {
             bool bArray = p.PropertyType.Name.Contains("[]");
@@ -315,6 +367,7 @@ internal partial class MainViewModel
             if (blockRecord == null) continue;
             if (blockRecord.BlockDatas.Count == 0) continue;
 
+            var name_strings = new List<string>();
             var param_strings = new List<string>();
 
             var record_value = blockRecord.BlockDatas[0];
@@ -326,6 +379,7 @@ internal partial class MainViewModel
             {
                 var dd = param.GetValue(record_value);
                 if (dd == null) continue;
+                name_strings.Add(param.Name);
                 if (param.PropertyType == typeof(string))
                 {
                     string val = (string)dd;
@@ -352,44 +406,94 @@ internal partial class MainViewModel
                 }
             }
 
-            string_values.Add((bArray, param_strings));
+            string_values.Add((bArray, name_strings, param_strings));
 
             nameValueCollection.Add(p.Name, record_value);
         }
 
         StringBuilder sb = new();
-        sb.AppendLine($"// [요청] {_selectedPanelType.Name} : {pathAttribute.Description}");
-        sb.AppendLine($"{_selectedPanelType.Name} tr_data = new()");
-        sb.AppendLine("\t{");
-        int nInBlockIndex = 0;
-        foreach (var name_value in nameValueCollection)
+        if (LangType == LANG_TYPE.CSHARP)
         {
-            var bArray = string_values[nInBlockIndex].bArray;
-            sb.Append($"\t\t{name_value.Key} = ");
-            if (bArray) sb.Append('[');
-            sb.Append("new(");
-            var inblock_values = string_values[nInBlockIndex].values;
-            for (int i = 0; i < inblock_values.Count; i++)
+            sb.AppendLine($"// [요청] {trName} : {pathAttribute.Description}");
+            sb.AppendLine($"{trName} tr_data = new()");
+            sb.AppendLine("\t{");
+            int nInBlockIndex = 0;
+            foreach (var name_value in nameValueCollection)
             {
-                if (i != 0) sb.Append(", ");
-                sb.Append($"{inblock_values[i]}");
+                var bArray = string_values[nInBlockIndex].bArray;
+                sb.Append($"\t\t{name_value.Key} = ");
+                if (bArray) sb.Append('[');
+                sb.Append("new(");
+                var inblock_values = string_values[nInBlockIndex].values;
+                for (int i = 0; i < inblock_values.Count; i++)
+                {
+                    if (i != 0) sb.Append(", ");
+                    sb.Append($"{inblock_values[i]}");
+                }
+                sb.Append("),");
+                if (bArray) sb.Append(" ],");
+                sb.AppendLine("");
+                nInBlockIndex++;
             }
-            sb.Append("),");
-            if (bArray) sb.Append(" ],");
-            sb.AppendLine("");
-            nInBlockIndex++;
-        }
-        sb.AppendLine("\t};");
-        sb.AppendLine("await _openApi.GetTRData(tr_data); // or _openApi.GetTRData(tr_data).Wait();");
+            sb.AppendLine("\t};");
+            sb.AppendLine("await _openApi.GetTRData(tr_data); // or _openApi.GetTRData(tr_data).Wait();");
 
-        var first_outblock = outBlockProperties.First();
-        sb.AppendLine($"if (tr_data.{first_outblock.Name} is null)");
-        sb.AppendLine("{");
-        sb.AppendLine("\t// 오류 처리");
-        sb.AppendLine("\tDebug.WriteLine(tr_data.rsp_cd.Length > 0 ? $\"{tr_data.rsp_cd}-{tr_data.rsp_msg}\" : _openApi.LastErrorMessage);");
-        sb.AppendLine("\treturn;");
-        sb.AppendLine("}");
-        sb.AppendLine($"// tr_data.{first_outblock.Name} 데이터 처리");
+            var first_outblock = outBlockProperties.First();
+            sb.AppendLine($"if (tr_data.{first_outblock.Name} is null)");
+            sb.AppendLine("{");
+            sb.AppendLine("\t// 오류 처리");
+            sb.AppendLine("\tDebug.WriteLine(tr_data.rsp_cd.Length > 0 ? $\"{tr_data.rsp_cd}-{tr_data.rsp_msg}\" : _openApi.LastErrorMessage);");
+            sb.AppendLine("\treturn;");
+            sb.AppendLine("}");
+            sb.AppendLine($"// tr_data.{first_outblock.Name} 데이터 처리");
+        }
+        else if (LangType == LANG_TYPE.PYTHON)
+        {
+            sb.AppendLine(
+                $$"""
+                    import asyncio
+                    import ebest
+                    from app_keys import appkey, appsecretkey # app_keys.py 파일에 appkey, appsecretkey 변수를 정의하고 사용하세요
+                    
+                    async def main():
+                        api=ebest.OpenApi()
+                        if not await api.login(appkey, appsecretkey): return print(f"연결실패: {api.last_message}")
+
+                        # [요청] {{trName}} : {{pathAttribute.Description}}
+                        request = {
+                    """);
+            int nInBlockIndex = 0;
+            foreach (var name_value in nameValueCollection)
+            {
+                var bArray = string_values[nInBlockIndex].bArray;
+                sb.Append($"        \"{name_value.Key}\": ");
+                if (bArray) sb.Append('[');
+                else sb.AppendLine("{");
+                var inblock_values = string_values[nInBlockIndex].values;
+                var inblock_names = string_values[nInBlockIndex].names;
+                for (int i = 0; i < inblock_values.Count; i++)
+                {
+                    sb.AppendLine($"            \"{inblock_names[i]}\": {inblock_values[i]},");
+                }
+                if (bArray) sb.Append(" ],");
+                sb.AppendLine($$"""        },""");
+                nInBlockIndex++;
+            }
+            sb.Append(
+                $$"""
+                        }
+                        response = await api.request("{{trName}}", request)
+
+                        if not response: return print(f"요청실패: {api.last_message}")
+                        print(response.body)
+
+                        ... # 다른 작업 수행
+                        await api.close()
+
+                    asyncio.run(main())
+                    
+                    """);
+        }
 
         EquipText = sb.ToString();
     }
@@ -416,62 +520,103 @@ internal partial class MainViewModel
         var outblock_props = block_props.Where(m => m.Name.Contains("OutBlock"));
 
         StringBuilder sb = new();
-        sb.AppendLine("// #pragma warning disable IDE1006");
-        sb.AppendLine();
-        sb.AppendLine("namespace eBEST.OpenApi.Models;");
-        sb.AppendLine();
-        sb.AppendLine($"// {tType.Name} : {pathAttribute.Description}");
-
         StringBuilder sb_param = new();
-        foreach (var block in block_props)
+        if (LangType == LANG_TYPE.CSHARP)
         {
-            if (!block.Name.Contains("InBlock") && !block.Name.Contains("OutBlock")) continue;
-            sb_param.Clear();
+            sb.AppendLine("// #pragma warning disable IDE1006");
+            sb.AppendLine();
+            sb.AppendLine("namespace eBEST.OpenApi.Models;");
+            sb.AppendLine();
+            sb.AppendLine($"// {tType.Name} : {pathAttribute.Description}");
 
-            if (_blockRecords.TryGetValue(block.Name, out var blockRecord))
+            foreach (var block in block_props)
             {
-                var parameters = blockRecord.GetProperties();
-                foreach (var param in parameters)
+                if (!block.Name.Contains("InBlock") && !block.Name.Contains("OutBlock")) continue;
+                sb_param.Clear();
+
+                if (_blockRecords.TryGetValue(block.Name, out var blockRecord))
                 {
-                    if (sb_param.Length > 0) sb_param.Append(", ");
-                    var typeName = param.PropertyType.Name switch
+                    var parameters = blockRecord.GetProperties();
+                    foreach (var param in parameters)
                     {
-                        "String" => "string",
-                        "Int32" => "int",
-                        "Double" => "double",
-                        "Int64" => "long",
-                        _ => param.PropertyType.Name
-                    };
-                    sb_param.Append($"{typeName} {param.Name}");
+                        if (sb_param.Length > 0) sb_param.Append(", ");
+                        var typeName = param.PropertyType.Name switch
+                        {
+                            "String" => "string",
+                            "Int32" => "int",
+                            "Double" => "double",
+                            "Int64" => "long",
+                            _ => param.PropertyType.Name
+                        };
+                        sb_param.Append($"{typeName} {param.Name}");
+                    }
+                    sb.AppendLine($"public record {block.Name}({sb_param});");
                 }
-                sb.AppendLine($"public record {block.Name}({sb_param});");
+
             }
 
-        }
 
+            sb.AppendLine();
+            sb.AppendLine($"[Path(\"{pathAttribute.Path}\")]");
+            sb.AppendLine($"public class {tType.Name} : TrBase");
+            sb.AppendLine("{");
+            sb.AppendLine("\t// 요청");
+            foreach (var block in inblock_props)
+            {
+                sb.AppendLine("\t" + $$$"""public {{{block.PropertyType.Name}}}? {{{block.Name}}} { get; set; }""");
+            }
+            sb.AppendLine();
+            sb.AppendLine("\t// 응답");
+            foreach (var block in outblock_props)
+            {
+                sb.AppendLine("\t" + $$$"""public {{{block.PropertyType.Name}}}? {{{block.Name}}} { get; set; }""");
+            }
+            sb.AppendLine("}");
+            sb.AppendLine();
+        }
+        else if (LangType == LANG_TYPE.PYTHON)
+        {
+            foreach (var block in block_props)
+            {
+                if (!block.Name.Contains("InBlock") && !block.Name.Contains("OutBlock")) continue;
+                sb_param.Clear();
 
-        sb.AppendLine();
-        sb.AppendLine($"[Path(\"{pathAttribute.Path}\")]");
-        sb.AppendLine($"public class {tType.Name} : TrBase");
-        sb.AppendLine("{");
-        sb.AppendLine("\t// 요청");
-        foreach (var block in inblock_props)
-        {
-            sb.AppendLine("\t" + $$$"""public {{{block.PropertyType.Name}}}? {{{block.Name}}} { get; set; }""");
+                if (_blockRecords.TryGetValue(block.Name, out var blockRecord))
+                {
+                    var parameters = blockRecord.GetConstructors()[0].GetParameters();//.GetProperties();
+                    sb.AppendLine($"class {block.Name}:");
+                    foreach (var param in parameters)
+                    {
+                        var typeName = param.ParameterType.Name switch
+                        {
+                            "String" => "str",
+                            "Int32" => "int",
+                            "Double" => "float",
+                            "Int64" => "int",
+                            _ => param.ParameterType.Name
+                        };
+                        DescriptionAttribute? descriptionAttribute = param.GetCustomAttribute<DescriptionAttribute>();
+                        sb.AppendLine($"    {param.Name}: {typeName}");
+                        if (descriptionAttribute != null)
+                        {
+                            var desc_text = descriptionAttribute.Description;
+                            desc_text = desc_text.Replace("\tdouble", "\tnumber");
+                            desc_text = desc_text.Replace("\tlong", "\tnumber");
+                            desc_text = desc_text.Replace("\tint", "\tnumber");
+                            sb.AppendLine($"    \"\"\" {desc_text}\"\"\"");
+                        }
+                        sb.AppendLine();
+                    }
+                }
+            }
         }
-        sb.AppendLine();
-        sb.AppendLine("\t// 응답");
-        foreach (var block in outblock_props)
-        {
-            sb.AppendLine("\t" + $$$"""public {{{block.PropertyType.Name}}}? {{{block.Name}}} { get; set; }""");
-        }
-        sb.AppendLine("}");
-        sb.AppendLine();
 
         EquipText = sb.ToString();
 
 
     }
+
+    partial void OnLangTypeChanged(LANG_TYPE oldValue, LANG_TYPE newValue) => MakeEquipText();
 
     void LoadToolsData()
     {

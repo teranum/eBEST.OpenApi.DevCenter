@@ -380,7 +380,7 @@ internal partial class MainViewModel
                     var newBlockData = Activator.CreateInstance(recordType, [.. paramObjects]);
                     if (newBlockData != null)
                     {
-                        inBlockDatas.Add(new(blockName, blockDescName, new List<object> { newBlockData, }));
+                        inBlockDatas.Add(new(blockName, blockDescName, [newBlockData,]));
                     }
                 }
                 else if (blockName.Contains("OutBlock"))
