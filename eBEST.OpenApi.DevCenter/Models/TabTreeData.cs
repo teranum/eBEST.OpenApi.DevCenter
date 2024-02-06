@@ -10,7 +10,7 @@ namespace eBEST.OpenApi.DevCenter.Models
         {
             Id = id;
             Name = name;
-            Items = new List<object>();
+            Items = [];
             FilterText = string.Empty;
         }
 

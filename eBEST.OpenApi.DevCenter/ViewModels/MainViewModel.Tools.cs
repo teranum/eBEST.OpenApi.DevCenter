@@ -1,12 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using eBEST.OpenApi.DevCenter.Views;
 
 namespace eBEST.OpenApi.DevCenter.ViewModels;
 
 internal partial class MainViewModel
 {
-    public string MenuCustomizeHeaderText { get; } = "리소스";
+    public string MenuCustomizeHeaderText { get; } = "About";
     public List<string> MenuCustomizeItems { get; } =
     [
+        "버젼정보",
         "이베스트 OpenApi 홈페이지",
         "DevCenter 오픈소스",
     ];
@@ -19,7 +21,16 @@ internal partial class MainViewModel
     [RelayCommand]
     void MenuCustomize(string text)
     {
-        if (text.Equals("이베스트 OpenApi 홈페이지"))
+        if (text.Equals("버젼정보"))
+        {
+            // 버젼 정보
+            if (_releaseTags != null && _releaseTags.Count != 0)
+            {
+                var versionView = new VersionView(_releaseTags);
+                versionView.ShowDialog();
+            }
+        }
+        else if (text.Equals("이베스트 OpenApi 홈페이지"))
         {
             var sInfo = new System.Diagnostics.ProcessStartInfo("https://openapi.ebestsec.co.kr/intro")
             {

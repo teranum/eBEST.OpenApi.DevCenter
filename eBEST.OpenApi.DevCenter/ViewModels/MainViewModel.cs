@@ -35,6 +35,8 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
         private readonly Window _mainWindow;
         private readonly EBestOpenApi _openApi;
 
+        [ObservableProperty] LANG_TYPE _langType = LANG_TYPE.CSHARP;
+
         public MainViewModel(IAppRegistry appRegistry)
         {
             var assemblyName = Application.ResourceAssembly.GetName();
@@ -66,6 +68,11 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
             if (Height != 0) _mainWindow.Height = Height;
             _mainWindow.Topmost = TopMost;
 
+            if (Enum.TryParse(_appRegistry.GetValue(session, nameof(LangType), nameof(LANG_TYPE.CSHARP)), out LANG_TYPE savedLangType))
+            {
+                LangType = savedLangType;
+            }
+
             _mainWindow.Closed += (s, e) =>
             {
                 _appRegistry.SetValue(session, "Left", (int)_mainWindow!.Left);
@@ -78,11 +85,13 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
                 _appRegistry.SetValue(session, nameof(TabListHeight), (int)TabListHeight.Value);
                 _appRegistry.SetValue(session, nameof(PropertyWidth), (int)PropertyWidth.Value);
 
+                _appRegistry.SetValue(session, nameof(LangType), LangType.ToString());
+
                 SaveToolsData();
             };
 
             // 로그 리스트 설정
-            TabListDatas = new List<TabListData>();
+            TabListDatas = [];
             string[] logKinds = Enum.GetNames(typeof(LogKind));
             foreach (string logKind in logKinds)
             {
@@ -194,17 +203,6 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
         bool CanLogin() => !_openApi.Connected;
         [RelayCommand] static void MenuExit() => System.Windows.Application.Current.Shutdown();
 
-        [RelayCommand]
-        void Menu_Version()
-        {
-            // 버젼 정보
-            if (_releaseTags != null && _releaseTags.Count != 0)
-            {
-                var versionView = new VersionView(_releaseTags);
-                versionView.ShowDialog();
-            }
-        }
-
         static Task<List<GithubTagInfo>?> GetGithubRepoTagInfos(string Username, string Repository)
         {
             // 깃헙 릴리즈 태그에서 가져오기
@@ -231,16 +229,5 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
             }
         }
 
-        [ObservableProperty] LANG_TYPE _langType = LANG_TYPE.CSHARP;
-        //[RelayCommand]
-        //void MenuModelLanguage(string lang)
-        //{
-        //    //LangType = lang switch
-        //    //{
-        //    //    "C#" => LANG_TYPE.CSHARP,
-        //    //    "Python" => LANG_TYPE.PYTHON,
-        //    //    _ => LANG_TYPE.CSHARP,
-        //    //};
-        //}
     }
 }

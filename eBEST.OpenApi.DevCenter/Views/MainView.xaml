@@ -53,17 +53,16 @@
                                 Header="항상위"
                                 IsCheckable="True"
                                 IsChecked="{Binding ElementName=root, Path=Topmost, Mode=TwoWay}" />
-                            <MenuItem Header="모델언어">
-                                <MenuItem
-                                    Header="C#"
-                                    IsCheckable="True"
-                                    IsChecked="{Binding LangType, Converter={StaticResource Equal2BooleanConverter}, ConverterParameter={x:Static Models:LANG_TYPE.CSHARP}}">
-                                </MenuItem>
-                                <MenuItem
-                                    Header="Python"
-                                    IsCheckable="True"
-                                    IsChecked="{Binding LangType, Converter={StaticResource Equal2BooleanConverter}, ConverterParameter={x:Static Models:LANG_TYPE.PYTHON}}" />
-                            </MenuItem>
+                        </MenuItem>
+                        <MenuItem Header="언어">
+                            <MenuItem
+                                Header="C#"
+                                IsCheckable="True"
+                                IsChecked="{Binding LangType, Converter={StaticResource Equal2BooleanConverter}, ConverterParameter={x:Static Models:LANG_TYPE.CSHARP}}" />
+                            <MenuItem
+                                Header="Python"
+                                IsCheckable="True"
+                                IsChecked="{Binding LangType, Converter={StaticResource Equal2BooleanConverter}, ConverterParameter={x:Static Models:LANG_TYPE.PYTHON}}" />
                         </MenuItem>
                         <MenuItem Header="{Binding MenuCustomizeHeaderText}" ItemsSource="{Binding MenuCustomizeItems}">
                             <MenuItem.ItemContainerStyle>
@@ -72,9 +71,6 @@
                                     <Setter Property="CommandParameter" Value="{Binding Path=Header, RelativeSource={RelativeSource self}}" />
                                 </Style>
                             </MenuItem.ItemContainerStyle>
-                        </MenuItem>
-                        <MenuItem Header="About">
-                            <MenuItem Command="{Binding Menu_VersionCommand}" Header="버젼정보" />
                         </MenuItem>
                         <Menu.Background>
                             <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">

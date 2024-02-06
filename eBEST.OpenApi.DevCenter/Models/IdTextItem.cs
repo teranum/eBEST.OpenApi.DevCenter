@@ -3,7 +3,7 @@
     internal class IdTextItem(int id, string name) : IdText(id, name)
     {
         public IdTextItem? Parent;
-        public IList<IdTextItem> Items { get; } = new List<IdTextItem>();
+        public IList<IdTextItem> Items { get; } = [];
         public void AddChild(IdTextItem item)
         {
             item.Parent = this;

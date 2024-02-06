@@ -7,7 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="VersionView"
     Width="600"
-    Height="410"
+    Height="440"
     ResizeMode="NoResize"
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
@@ -25,7 +25,7 @@
                             <StackPanel>
                                 <TextBlock Margin="0,5" Text="{Binding published_at}" />
                                 <TextBox
-                                    Height="100"
+                                    Height="60"
                                     AcceptsReturn="True"
                                     HorizontalScrollBarVisibility="Auto"
                                     IsReadOnly="True"
