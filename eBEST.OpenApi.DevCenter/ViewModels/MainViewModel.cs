@@ -5,6 +5,7 @@ using eBEST.OpenApi.DevCenter.Helpers;
 using eBEST.OpenApi.DevCenter.Models;
 using eBEST.OpenApi.DevCenter.Views;
 using eBEST.OpenApi.Models;
+using Microsoft.VisualBasic.ApplicationServices;
 using System.Windows;
 
 namespace eBEST.OpenApi.DevCenter.ViewModels
@@ -170,8 +171,10 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
         void MenuLogin()
         {
             // 기존 키 로딩
-            string AppKey = _appRegistry.GetValue("InitData", "AppKey", string.Empty);
-            string SecretKey = _appRegistry.GetValue("InitData", "SecretKey", string.Empty);
+            string AppKey = StringCipher.Decrypt(_appRegistry.GetValue("InitData", "AppKey", string.Empty));
+            string SecretKey = StringCipher.Decrypt(_appRegistry.GetValue("InitData", "SecretKey", string.Empty));
+            //string AppKey = _appRegistry.GetValue("InitData", "AppKey", string.Empty);
+            //string SecretKey = _appRegistry.GetValue("InitData", "SecretKey", string.Empty);
             bool IsRememberKey = _appRegistry.GetValue("InitData", "IsRememberKey", DefValue: false);
 
             var keyWindow = new KeySetting
@@ -189,8 +192,10 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
 
                 if (IsRememberKey)
                 {
-                    _appRegistry.SetValue("InitData", "AppKey", AppKey);
-                    _appRegistry.SetValue("InitData", "SecretKey", SecretKey);
+                    _appRegistry.SetValue("InitData", "AppKey", StringCipher.Encrypt(AppKey));
+                    _appRegistry.SetValue("InitData", "SecretKey", StringCipher.Encrypt(SecretKey));
+                    //_appRegistry.SetValue("InitData", "AppKey", AppKey);
+                    //_appRegistry.SetValue("InitData", "SecretKey", SecretKey);
                     _appRegistry.SetValue("InitData", "IsRememberKey", IsRememberKey);
                 }
                 else
