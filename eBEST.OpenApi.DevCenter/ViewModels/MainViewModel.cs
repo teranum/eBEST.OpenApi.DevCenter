@@ -5,9 +5,6 @@ using eBEST.OpenApi.DevCenter.Helpers;
 using eBEST.OpenApi.DevCenter.Models;
 using eBEST.OpenApi.DevCenter.Views;
 using eBEST.OpenApi.Models;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
 using System.Windows;
 
 namespace eBEST.OpenApi.DevCenter.ViewModels
@@ -15,7 +12,8 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
     internal partial class MainViewModel : ObservableObject
     {
         private readonly string _appVersion;
-        private List<GithubTagInfo>? _releaseTags;
+        private GithupRepoHelper _githupRepoHelper;
+        private IList<GithupRepoHelper.GithubTagInfo>? _releaseTags;
 
         [ObservableProperty] string _title = "eBEST OpenApi DevCenter";
         [ObservableProperty] string _statusText = "Ready";
@@ -40,10 +38,11 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
         public MainViewModel(IAppRegistry appRegistry)
         {
             var assemblyName = Application.ResourceAssembly.GetName();
-            _appVersion = $"{assemblyName.Version!.Major}.{assemblyName.Version.Minor}";
+            _appVersion = $"{assemblyName.Version!.Major}.{assemblyName.Version.Minor}.{assemblyName.Version.Build}";
             _title = $"{assemblyName.Name} v{_appVersion}";
 
             _appRegistry = appRegistry;
+            _githupRepoHelper = new("teranum", "eBEST.OpenApi.DevCenter");
             _mainWindow = Application.Current.MainWindow;
             _openApi = new();
             _openApi.OnConnectEvent += OpenApi_OnConnectEvent;
@@ -101,15 +100,16 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
 
             OutputLog(LogKind.LOGS, "Application Start");
 
-            var models = ModelsHelper.GetModelClasses();
-            foreach (var model in models)
+            var model_and_blocks = ModelsHelper.GetModelClasses();
+            foreach (var type in model_and_blocks)
             {
-                _modelClasses.Add(model.Name, model);
-            }
-            var records = ModelsHelper.GetBlockRecords();
-            foreach (var record in records)
-            {
-                _blockRecords.Add(record.Name, record);
+                if (type.BaseType != null)
+                {
+                    if (type.BaseType.Name.Equals("TrBase"))
+                        _modelClasses.Add(type.Name, type);
+                    else
+                        _blockRecords.Add(type.Name, type);
+                }
             }
 
             _ = CheckVersionAsync();
@@ -117,13 +117,15 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
             LoadTrDatas();
 
             LoadToolsData();
+
+            LoadUserCustomItems();
         }
 
         private async Task CheckVersionAsync()
         {
             // 깃헙에서 최신 버전 정보 가져오기
 
-            _releaseTags = await GetGithubRepoTagInfos("teranum", "eBEST.OpenApi.DevCenter").ConfigureAwait(true);
+            _releaseTags = await _githupRepoHelper.GetTagInfosAsync();
             if (_releaseTags != null && _releaseTags.Count > 0)
             {
                 var lastTag = _releaseTags[0];
@@ -202,15 +204,6 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
         }
         bool CanLogin() => !_openApi.Connected;
         [RelayCommand] static void MenuExit() => System.Windows.Application.Current.Shutdown();
-
-        static Task<List<GithubTagInfo>?> GetGithubRepoTagInfos(string Username, string Repository)
-        {
-            // 깃헙 릴리즈 태그에서 가져오기
-            HttpClient client = new();
-            var pih = ProductInfoHeaderValue.Parse(Repository);
-            client.DefaultRequestHeaders.UserAgent.Add(pih);
-            return client.GetFromJsonAsync<List<GithubTagInfo>>($"https://api.github.com/repos/{Username}/{Repository}/releases");
-        }
 
         [RelayCommand]
         void MenuMacAddrSetting()
