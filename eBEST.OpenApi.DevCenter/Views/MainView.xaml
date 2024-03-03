@@ -121,7 +121,7 @@
                                 Height="22"
                                 Padding="10,5,0,0"
                                 VerticalAlignment="Center"
-                                Text="TR 요청/응답">
+                                Text="{Binding MainPartTitle}">
                                 <TextBlock.Background>
                                     <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
                                         <GradientStop Offset="1" Color="#FFF9F7F7" />
@@ -273,6 +273,10 @@
                                     </Controls:BindableAvalonEditor>
                                 </Grid>
                             </Grid>
+                            <ContentControl
+                                Grid.Row="1"
+                                Content="{Binding UserContent}"
+                                Visibility="{Binding IsUserContentVisibled, Converter={StaticResource BooleanToVisibilityConverter}}" />
                         </Grid>
                         <GridSplitter
                             Grid.Column="1"

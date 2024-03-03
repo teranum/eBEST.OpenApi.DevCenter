@@ -1,7 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using eBEST.OpenApi.DevCenter.Models;
-using eBEST.OpenApi.Models;
-using System.ComponentModel;
 using System.Reflection;
 
 namespace eBEST.OpenApi.DevCenter.ViewModels;
@@ -9,6 +7,7 @@ namespace eBEST.OpenApi.DevCenter.ViewModels;
 internal partial class MainViewModel
 {
     [ObservableProperty] string _tRName = "";
+    [ObservableProperty] string _MainPartTitle = "TR 요청/응답";
     [ObservableProperty] IList<BlockRecord>? _inBlockDatas;
     [ObservableProperty] IList<BlockRecord>? _outBlockDatas;
 
@@ -176,14 +175,14 @@ internal partial class MainViewModel
 
             group.IsExpanded = true;
         }
-        var 실시간ELW = new IdTextItem(image_Group, "ELW");
-        {
-            var group = 실시간ELW;
+        //var 실시간ELW = new IdTextItem(image_Group, "ELW");
+        //{
+        //    var group = 실시간ELW;
 
-            GetChildTrData(group, "/websocket/elw");
+        //    GetChildTrData(group, "/websocket/elw");
 
-            group.IsExpanded = true;
-        }
+        //    group.IsExpanded = true;
+        //}
         var 실시간해외선물 = new IdTextItem(image_Group, "해외선물");
         {
             var group = 실시간해외선물;
@@ -218,12 +217,13 @@ internal partial class MainViewModel
 
         var Real목록 = new TabTreeData(2, "Real목록")
         {
-            OrgItems = [실시간업종, 실시간주식, 실시간선물옵션, 실시간ELW, 실시간해외선물, 실시간기타, 실시간_시세_투자정보],
+            OrgItems = [실시간업종, 실시간주식, 실시간선물옵션, /*실시간ELW,*/ 실시간해외선물, 실시간기타, 실시간_시세_투자정보],
         };
 
         var CustomList = new TabTreeData(0, "사용자기능")
         {
-            OrgItems = [new IdTextItem(image_Group, "API정보(개발중...)"),],
+            //OrgItems = new ObservableCollection<object>(),
+            OrgItems = [],
         };
 
         TabTreeDatas = [Tr목록, Real목록, CustomList];
@@ -266,43 +266,59 @@ internal partial class MainViewModel
             {
                 var item = new IdTextItem(4, (bArray ? prop.Name + " - OCCURS" : prop.Name)) { Tag = recordType, };
                 bool bInputBlock = blockName.Contains("InBlock");
-                GeRecordProps(item, bInputBlock ? 20 : 19);
+                GetRecordProps(item, bInputBlock ? 20 : 19);
                 item.IsExpanded = true;
                 owner.AddChild(item);
             }
         }
     }
 
-    private static void GeRecordProps(IdTextItem owner, int imageId)
+    private static void GetRecordProps(IdTextItem owner, int imageId)
     {
         Type type = (Type)owner.Tag!;
         var paramsInfo = type.GetConstructors()[0].GetParameters();
         foreach (var paramInfo in paramsInfo)
         {
             string name = paramInfo.Name!;
-            DescriptionAttribute? descriptionAttribute = paramInfo.GetCustomAttribute<DescriptionAttribute>();
+            BlockFieldAttribute? descriptionAttribute = paramInfo.GetCustomAttribute<BlockFieldAttribute>();
             if (descriptionAttribute != null)
             {
-                var words = descriptionAttribute.Description.Split('\t');
-                if (words.Length >= 3)
-                {
-                    name += " : " + words[0] + "    " + words[1] + "(" + words[2] + ")";
-                }
+                name += " : " + descriptionAttribute.Description + "    " + GetParameterTypeName(paramInfo.ParameterType) + "(" + descriptionAttribute.Size + ")";
             }
             var item = new IdTextItem(imageId, name) { Tag = paramInfo, };
             owner.AddChild(item);
         }
     }
 
+    private static string GetParameterTypeName(Type type)
+    {
+        return type.Name switch
+        {
+            "String" => "string",
+            "Int32" => "int",
+            "Double" => "double",
+            "Int64" => "long",
+            _ => type.Name
+        };
+    }
 
     private void TreeView_SelectedItemChanged(IdTextItem? selectedItem)
     {
         if (SelectedTabTreeData is null) return;
         if (selectedItem is null) return;
-
-        if (selectedItem.Id == 14)
+        if (selectedItem.Id == 2)
         {
-            SelectPanelType((Type)selectedItem.Tag!);
+            SelectUserCustom(selectedItem);
+        }
+        else
+        {
+
+            if (selectedItem.Id == 14)
+            {
+                MainPartTitle = "TR 요청/응답";
+                UserContent = null;
+                SelectPanelType((Type)selectedItem.Tag!);
+            }
         }
     }
 
@@ -376,6 +392,8 @@ internal partial class MainViewModel
                             paramObjects.Add(_appRegistry.GetValue(recordType.Name, param.Name!, 0L));
                             continue;
                         }
+
+                        paramObjects.Add(new object());
                     }
                     var newBlockData = Activator.CreateInstance(recordType, [.. paramObjects]);
                     if (newBlockData != null)

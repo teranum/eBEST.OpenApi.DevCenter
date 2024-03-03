@@ -1,4 +1,4 @@
-﻿using eBEST.OpenApi.DevCenter.Models;
+﻿using eBEST.OpenApi.DevCenter.Helpers;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Navigation;
@@ -10,9 +10,9 @@ namespace eBEST.OpenApi.DevCenter.Views
     /// </summary>
     public partial class VersionView : Window
     {
-        public IList<GithubTagInfo> TagInfos { get; }
+        public IList<GithupRepoHelper.GithubTagInfo> TagInfos { get; }
 
-        public VersionView(IList<GithubTagInfo> tagInfos)
+        public VersionView(IList<GithupRepoHelper.GithubTagInfo> tagInfos)
         {
             InitializeComponent();
             Owner = Application.Current.MainWindow;

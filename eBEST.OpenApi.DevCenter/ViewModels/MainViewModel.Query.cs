@@ -1,9 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using eBEST.OpenApi.DevCenter.Models;
-using eBEST.OpenApi.Models;
 using System.Collections;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text;
@@ -272,7 +270,7 @@ internal partial class MainViewModel
                 if (pathAttribute.Key.Equals("account"))
                 {
                     sb_wss.AppendLine($"// [실시간 계좌응답 요청] {trName} : {pathAttribute.Description}");
-                    sb_wss.AppendLine($"_openApi.AddAccountRealtimeRequest(\"{trName}\");");
+                    sb_wss.AppendLine($"api.AddAccountRealtimeRequest(\"{trName}\");");
                 }
                 else
                 {
@@ -283,14 +281,14 @@ internal partial class MainViewModel
                     var inblock_prop_first = inblock_props[0];
                     var inblock_forst_data = inblock_prop_first.GetValue(in_record);
                     sb_wss.AppendLine($"// [실시간 시세 요청] {trName} : {pathAttribute.Description}");
-                    sb_wss.AppendLine($"_openApi.AddRealtimeRequest(\"{trName}\", \"{inblock_forst_data}\");");
+                    sb_wss.AppendLine($"await api.AddRealtimeRequest(\"{trName}\", \"{inblock_forst_data}\");");
                 }
                 sb_wss.AppendLine();
                 sb_wss.AppendLine($"// OnRealtimeEvent 이벤트");
                 sb_wss.AppendLine("JsonSerializerOptions _jsonOptions = new() { NumberHandling = JsonNumberHandling.AllowReadingFromString };");
                 sb_wss.AppendLine($"if (e.TrCode.Equals(\"{trName}\"))");
                 sb_wss.AppendLine("{");
-                sb_wss.AppendLine($"\t{trName}OutBlock? outBlockData = JsonSerializer.Deserialize<{trName}OutBlock>(e.RealtimeBody, _jsonOptions);");
+                sb_wss.AppendLine($"\tvar outBlockData = e.RealtimeBody.Deserialize<{trName}OutBlock>(_jsonOptions);");
                 sb_wss.AppendLine($"\tif (outBlockData is not null)");
                 sb_wss.AppendLine("\t{");
                 sb_wss.AppendLine($"\t\t// {trName}OutBlock 데이터 처리");
@@ -320,14 +318,17 @@ internal partial class MainViewModel
                 }
                 else
                 {
-                    // InBlock 프로퍼티 찾는다
-                    var in_record = InBlockDatas[0].BlockDatas[0];
-                    var inblock_props = in_record.GetType().GetProperties();
-                    if (inblock_props.Length == 0) return;
-                    var inblock_prop_first = inblock_props[0];
-                    var inblock_forst_data = inblock_prop_first.GetValue(in_record);
                     sb_wss.AppendLine($"    # [실시간 시세 요청] {trName} : {pathAttribute.Description}");
-                    sb_wss.AppendLine($"    await api.add_realtime(\"{trName}\", \"{inblock_forst_data}\")");
+                    // InBlock 프로퍼티 찾는다
+                    if (InBlockDatas.Count > 0)
+                    {
+                        var in_record = InBlockDatas[0].BlockDatas[0];
+                        var inblock_props = in_record.GetType().GetProperties();
+                        if (inblock_props.Length == 0) return;
+                        var inblock_prop_first = inblock_props[0];
+                        var inblock_forst_data = inblock_prop_first.GetValue(in_record);
+                        sb_wss.AppendLine($"    await api.add_realtime(\"{trName}\", \"{inblock_forst_data}\")");
+                    }
                 }
 
                 sb_wss.Append(
@@ -436,15 +437,16 @@ internal partial class MainViewModel
                 nInBlockIndex++;
             }
             sb.AppendLine("\t};");
-            sb.AppendLine("await _openApi.GetTRData(tr_data); // or _openApi.GetTRData(tr_data).Wait();");
+            sb.AppendLine("await api.GetTRData(tr_data);");
 
             var first_outblock = outBlockProperties.First();
             sb.AppendLine($"if (tr_data.{first_outblock.Name} is null)");
             sb.AppendLine("{");
             sb.AppendLine("\t// 오류 처리");
-            sb.AppendLine("\tDebug.WriteLine(tr_data.rsp_cd.Length > 0 ? $\"{tr_data.rsp_cd}-{tr_data.rsp_msg}\" : _openApi.LastErrorMessage);");
+            sb.AppendLine("\tprint(tr_data.rsp_cd.Length > 0 ? $\"{tr_data.rsp_cd}-{tr_data.rsp_msg}\" : api.LastErrorMessage);");
             sb.AppendLine("\treturn;");
             sb.AppendLine("}");
+            sb.AppendLine();
             sb.AppendLine($"// tr_data.{first_outblock.Name} 데이터 처리");
         }
         else if (LangType == LANG_TYPE.PYTHON)
@@ -523,10 +525,6 @@ internal partial class MainViewModel
         StringBuilder sb_param = new();
         if (LangType == LANG_TYPE.CSHARP)
         {
-            sb.AppendLine("// #pragma warning disable IDE1006");
-            sb.AppendLine();
-            sb.AppendLine("namespace eBEST.OpenApi.Models;");
-            sb.AppendLine();
             sb.AppendLine($"// {tType.Name} : {pathAttribute.Description}");
 
             foreach (var block in block_props)
@@ -540,14 +538,7 @@ internal partial class MainViewModel
                     foreach (var param in parameters)
                     {
                         if (sb_param.Length > 0) sb_param.Append(", ");
-                        var typeName = param.PropertyType.Name switch
-                        {
-                            "String" => "string",
-                            "Int32" => "int",
-                            "Double" => "double",
-                            "Int64" => "long",
-                            _ => param.PropertyType.Name
-                        };
+                        var typeName = GetParameterTypeName(param.PropertyType);
                         sb_param.Append($"{typeName} {param.Name}");
                     }
                     sb.AppendLine($"public record {block.Name}({sb_param});");
@@ -595,7 +586,7 @@ internal partial class MainViewModel
                             "Int64" => "int",
                             _ => param.ParameterType.Name
                         };
-                        DescriptionAttribute? descriptionAttribute = param.GetCustomAttribute<DescriptionAttribute>();
+                        BlockFieldAttribute? descriptionAttribute = param.GetCustomAttribute<BlockFieldAttribute>();
                         sb.AppendLine($"    {param.Name}: {typeName}");
                         if (descriptionAttribute != null)
                         {
@@ -603,7 +594,7 @@ internal partial class MainViewModel
                             desc_text = desc_text.Replace("\tdouble", "\tnumber");
                             desc_text = desc_text.Replace("\tlong", "\tnumber");
                             desc_text = desc_text.Replace("\tint", "\tnumber");
-                            sb.AppendLine($"    \"\"\" {desc_text}\"\"\"");
+                            sb.AppendLine($"    \"\"\" {descriptionAttribute.Description} : {typeName} ({descriptionAttribute.Size})\"\"\"");
                         }
                         sb.AppendLine();
                     }
