@@ -8,7 +8,7 @@ namespace eBEST.OpenApi.DevCenter.Controls
         {
             AutoGeneratingColumn += (sender, e) =>
             {
-                if (e.PropertyName.Contains("_"))
+                if (e.PropertyName.Contains('_'))
                 {
                     e.Column.Header = e.PropertyName.Replace("_", "__");
                 }
