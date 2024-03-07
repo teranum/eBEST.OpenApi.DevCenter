@@ -172,14 +172,19 @@ internal partial class MainViewModel
                 // for next tr_cont
                 if (tr_cont.Equals("Y"))
                 {
-                    Type dataType = record_value.GetType();
-                    if (dataType.GetProperty("cts_date") is PropertyInfo prop_cts_date)
-                        prop_cts_date.SetValue(record_value, _save_cts_date);
-                    if (dataType.GetProperty("cts_time") is PropertyInfo prop_cts_time)
-                        prop_cts_time.SetValue(record_value, _save_cts_time);
+                    List<object?> value_list = [];
+                    foreach (var param in parameters)
+                    {
+                        var prop_value = param.GetValue(record_value);
+                        if (param.Name.Equals("cts_date")) prop_value = _save_cts_date;
+                        else if (param.Name.Equals("cts_time")) prop_value = _save_cts_time;
+                        value_list.Add(prop_value);
+                    }
+                    var r4 = Activator.CreateInstance(recordType, [.. value_list]);
+                    nameValueCollection.Add(p.Name, r4);
                 }
-
-                nameValueCollection.Add(p.Name, record_value);
+                else
+                    nameValueCollection.Add(p.Name, record_value);
             }
         }
         string jsonbody = JsonSerializer.Serialize(nameValueCollection);
