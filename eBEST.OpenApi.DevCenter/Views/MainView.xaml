@@ -175,7 +175,7 @@
                                                 <DataTemplate>
                                                     <StackPanel>
                                                         <Label Content="{Binding DescName}" />
-                                                        <DataGrid
+                                                        <Controls:UnderscoreHeaderDataGrid
                                                             MaxHeight="300"
                                                             CanUserAddRows="False"
                                                             CanUserDeleteRows="False"
@@ -210,7 +210,7 @@
                                                                     </Setter>
                                                                 </Style>
                                                             </DataGrid.CellStyle>
-                                                        </DataGrid>
+                                                        </Controls:UnderscoreHeaderDataGrid>
                                                     </StackPanel>
                                                 </DataTemplate>
                                             </ItemsControl.ItemTemplate>
@@ -220,7 +220,7 @@
                                                 <DataTemplate>
                                                     <StackPanel>
                                                         <Label Content="{Binding DescName}" />
-                                                        <DataGrid
+                                                        <Controls:UnderscoreHeaderDataGrid
                                                             MaxHeight="300"
                                                             CanUserAddRows="False"
                                                             CanUserDeleteRows="False"
@@ -242,7 +242,7 @@
                                                                         Header="데이터 복사" />
                                                                 </ContextMenu>
                                                             </DataGrid.ContextMenu>
-                                                        </DataGrid>
+                                                        </Controls:UnderscoreHeaderDataGrid>
                                                     </StackPanel>
                                                 </DataTemplate>
                                             </ItemsControl.ItemTemplate>

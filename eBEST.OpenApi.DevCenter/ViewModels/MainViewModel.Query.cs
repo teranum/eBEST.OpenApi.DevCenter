@@ -26,6 +26,8 @@ internal partial class MainViewModel
 
     private string _save_tr_cont = string.Empty;
     private string _save_tr_cont_key = string.Empty;
+    private string _save_cts_date = string.Empty;
+    private string _save_cts_time = string.Empty;
 
     [RelayCommand]
     void Query()
@@ -166,7 +168,19 @@ internal partial class MainViewModel
             if (bArray)
                 nameValueCollection.Add(p.Name, blockRecord.BlockDatas);
             else
+            {
+                // for next tr_cont
+                if (tr_cont.Equals("Y"))
+                {
+                    Type dataType = record_value.GetType();
+                    if (dataType.GetProperty("cts_date") is PropertyInfo prop_cts_date)
+                        prop_cts_date.SetValue(record_value, _save_cts_date);
+                    if (dataType.GetProperty("cts_time") is PropertyInfo prop_cts_time)
+                        prop_cts_time.SetValue(record_value, _save_cts_time);
+                }
+
                 nameValueCollection.Add(p.Name, record_value);
+            }
         }
         string jsonbody = JsonSerializer.Serialize(nameValueCollection);
 
@@ -198,6 +212,8 @@ internal partial class MainViewModel
         QueryNextCommand.NotifyCanExecuteChanged();
 
         var resultBody = JsonSerializer.Deserialize(jsonResponse, _selectedPanelType, _jsonOptions);
+        _save_cts_date = string.Empty;
+        _save_cts_time = string.Empty;
 
         List<BlockRecord> newOutBlockDatas = [];
         foreach (var p in outBlockProperties)
@@ -217,6 +233,15 @@ internal partial class MainViewModel
             else
             {
                 newList.Add(data);
+                // for next tr_cont
+                if (_save_tr_cont.Equals("Y"))
+                {
+                    Type dataType = data.GetType();
+                    if (dataType.GetProperty("cts_date") is PropertyInfo prop_cts_date)
+                        _save_cts_date = (string)prop_cts_date.GetValue(data)!;
+                    if (dataType.GetProperty("cts_time") is PropertyInfo prop_cts_time)
+                        _save_cts_time = (string)prop_cts_time.GetValue(data)!;
+                }
             }
             var blockDescName = p.Name + (bArray ? " : OCCURS" : string.Empty);
             newOutBlockDatas.Add(new BlockRecord(p.Name, $"{blockDescName} ({newList.Count})", newList));
@@ -485,8 +510,8 @@ internal partial class MainViewModel
                 $$"""
                         }
                         response = await api.request("{{trName}}", request)
-
                         if not response: return print(f"요청실패: {api.last_message}")
+                    
                         print(response.body)
 
                         ... # 다른 작업 수행
