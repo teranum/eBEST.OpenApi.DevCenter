@@ -5,7 +5,6 @@ using eBEST.OpenApi.DevCenter.Helpers;
 using eBEST.OpenApi.DevCenter.Models;
 using eBEST.OpenApi.DevCenter.Views;
 using eBEST.OpenApi.Models;
-using Microsoft.VisualBasic.ApplicationServices;
 using System.Windows;
 
 namespace eBEST.OpenApi.DevCenter.ViewModels
@@ -49,6 +48,7 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
             _openApi.OnConnectEvent += OpenApi_OnConnectEvent;
             _openApi.OnMessageEvent += OpenApi_OnMessageEvent;
             _openApi.OnRealtimeEvent += OpenApi_OnRealtimeEvent;
+            InitialJsonOptions();
 
             // 메인 윈도우 설정값 로딩
             string session = _mainWindow.GetType().Name;
