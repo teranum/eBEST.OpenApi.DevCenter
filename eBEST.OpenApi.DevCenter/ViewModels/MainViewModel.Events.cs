@@ -38,7 +38,15 @@ internal partial class MainViewModel
                 if (outblock_prop != null)
                 {
                     var block_type = outblock_prop.PropertyType;
-                    var data = JsonSerializer.Deserialize(e.RealtimeBody, block_type, _jsonOptions);
+                    object? data = null;
+                    try
+                    {
+                        data = e.RealtimeBody.Deserialize(block_type, _jsonOptions);
+                    }
+                    catch (Exception)
+                    {
+                        data = null;
+                    }
                     if (data != null)
                     {
                         OutputLog(LogKind.실시간계좌응답, $"TrCode={e.TrCode}, Key={e.Key}");
@@ -58,8 +66,6 @@ internal partial class MainViewModel
                     }
                     else
                         OutputLog(LogKind.실시간계좌응답, $"TrCode={e.TrCode}, Key={e.Key}, {e.RealtimeBody}");
-
-                    return;
                 }
             }
         }
