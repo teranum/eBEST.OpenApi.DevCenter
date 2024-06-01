@@ -61,6 +61,6 @@ internal class AppRegistry : IAppRegistry
         string subKeyName = $"{CorpAssemKey}\\{SectionName}";
         using var regkey = CurrentUser.OpenSubKey(subKeyName, writable: true);
         if (regkey is null) return;
-        regkey.DeleteValue(KeyName);
+        regkey.DeleteValue(KeyName, false);
     }
 }

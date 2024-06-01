@@ -22,8 +22,8 @@
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="*" />
 		<PackageReference Include="AvalonEdit" Version="*" />
-		<PackageReference Include="eBEST.OpenApi" Version="1.4.0" />
-		<PackageReference Include="eBEST.OpenApi.Models" Version="1.4.0" />
+		<PackageReference Include="eBEST.OpenApi" Version="2.0.0" />
+		<PackageReference Include="eBEST.OpenApi.Models" Version="1.4.4" />
 	</ItemGroup>
 
 </Project>
