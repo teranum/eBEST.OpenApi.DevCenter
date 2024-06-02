@@ -43,7 +43,15 @@
                     </Grid.RowDefinitions>
                     <Menu Height="22" VerticalAlignment="Top">
                         <MenuItem Header="파일">
-                            <MenuItem Command="{Binding MenuLoginCommand}" Header="OpenApi 접속" />
+                            <MenuItem Header="OpenApi 접속" ItemsSource="{Binding MenuLoginProfiles}">
+                                <MenuItem.ItemContainerStyle>
+                                    <Style TargetType="{x:Type MenuItem}">
+                                        <Setter Property="Command" Value="{Binding Path=DataContext.MenuLoginCommand, ElementName=root}" />
+                                        <Setter Property="CommandParameter" Value="{Binding}" />
+                                    </Style>
+                                </MenuItem.ItemContainerStyle>
+                            </MenuItem>
+                            <MenuItem Command="{Binding MenuLogoutCommand}" Header="OpenApi 로그아웃" />
                             <MenuItem Command="{Binding MenuMacAddrSettingCommand}" Header="Mac Address 설정" />
                             <Separator />
                             <MenuItem Command="{Binding MenuExitCommand}" Header="끝내기" />
@@ -104,7 +112,7 @@
                     </Grid.RowDefinitions>
                     <Grid Grid.Row="0">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" MinWidth="50" />
                             <ColumnDefinition Width="4" />
                             <ColumnDefinition
                                 Width="{Binding PropertyWidth, Mode=TwoWay}"

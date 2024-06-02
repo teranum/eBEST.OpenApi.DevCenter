@@ -7,12 +7,18 @@ namespace eBEST.OpenApi.DevCenter.Views
     /// </summary>
     public partial class KeySetting : Window
     {
-        public KeySetting()
+        public KeySetting(string profileName, string appKey, string appSecretKey)
         {
             InitializeComponent();
 
             Owner = Application.Current.MainWindow;
             Topmost = Owner.Topmost;
+
+            Title = $"키 설정 - {profileName}";
+
+            textProfileName.Text = profileName;
+            textAppKey.Text = appKey;
+            textSecretKey.Text = appSecretKey;
         }
 
         private void OK_Button_Click(object sender, RoutedEventArgs e)
@@ -32,6 +38,12 @@ namespace eBEST.OpenApi.DevCenter.Views
                     return;
                 }
             }
+        }
+
+        public string ProfileName
+        {
+            get => textProfileName.Text;
+            set => textProfileName.Text = value;
         }
 
         public string AppKey

@@ -9,8 +9,8 @@ internal partial class MainViewModel
     public List<string> MenuCustomizeItems { get; } =
     [
         "버젼정보",
-        "이베스트 OpenApi 홈페이지",
-        "DevCenter 오픈소스",
+        "LS증권 OpenApi 홈페이지",
+        //"DevCenter 오픈소스",
     ];
 
     internal void OnDataGridCellEditEnding()
@@ -30,22 +30,22 @@ internal partial class MainViewModel
                 versionView.ShowDialog();
             }
         }
-        else if (text.Equals("이베스트 OpenApi 홈페이지"))
+        else if (text.Equals("LS증권 OpenApi 홈페이지"))
         {
-            var sInfo = new System.Diagnostics.ProcessStartInfo("https://openapi.ebestsec.co.kr/intro")
+            var sInfo = new System.Diagnostics.ProcessStartInfo("https://openapi.ls-sec.co.kr/intro")
             {
                 UseShellExecute = true,
             };
             System.Diagnostics.Process.Start(sInfo);
         }
-        else if (text.Equals("DevCenter 오픈소스"))
-        {
-            var sInfo = new System.Diagnostics.ProcessStartInfo("https://github.com/teranum/eBEST.OpenApi.DevCenter")
-            {
-                UseShellExecute = true,
-            };
-            System.Diagnostics.Process.Start(sInfo);
-        }
+        //else if (text.Equals("DevCenter 오픈소스"))
+        //{
+        //    var sInfo = new System.Diagnostics.ProcessStartInfo("https://github.com/teranum/eBEST.OpenApi.DevCenter")
+        //    {
+        //        UseShellExecute = true,
+        //    };
+        //    System.Diagnostics.Process.Start(sInfo);
+        //}
     }
 
 }

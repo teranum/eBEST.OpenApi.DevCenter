@@ -5,10 +5,72 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace eBEST.OpenApi.DevCenter.ViewModels;
+internal sealed class Int32Converter : JsonConverter<int>
+{
+    public override int Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType == JsonTokenType.String)
+        {
+            var sval = reader.GetString();
+            return int.TryParse(sval, out int lval) ? lval : 0;
+        }
+
+        return reader.GetInt32();
+    }
+
+    public override void Write(Utf8JsonWriter writer, int value, JsonSerializerOptions options)
+    {
+        writer.WriteNumberValue(value);
+    }
+}
+internal sealed class Int64Converter : JsonConverter<long>
+{
+    public override long Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType == JsonTokenType.String)
+        {
+            var sval = reader.GetString();
+            return long.TryParse(sval, out long lval) ? lval : 0L;
+        }
+
+        return reader.GetInt64();
+    }
+
+    public override void Write(Utf8JsonWriter writer, long value, JsonSerializerOptions options)
+    {
+        writer.WriteNumberValue(value);
+    }
+}
+internal sealed class DoubleConverter : JsonConverter<double>
+{
+    public override double Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType == JsonTokenType.String)
+        {
+            var sval = reader.GetString();
+            return double.TryParse(sval, out double lval) ? lval : 0L;
+        }
+
+        return reader.GetInt64();
+    }
+
+    public override void Write(Utf8JsonWriter writer, double value, JsonSerializerOptions options)
+    {
+        writer.WriteNumberValue(value);
+    }
+}
 
 internal partial class MainViewModel
 {
     private readonly JsonSerializerOptions _jsonOptions = new() { NumberHandling = JsonNumberHandling.AllowReadingFromString };
+
+    void InitialJsonOptions()
+    {
+        _jsonOptions.Converters.Add(new Int32Converter());
+        _jsonOptions.Converters.Add(new Int64Converter());
+        _jsonOptions.Converters.Add(new DoubleConverter());
+    }
+
     private void OpenApi_OnConnectEvent(object? sender, EBestOnConnectEventArgs e)
     {
         StatusUrl = string.Empty;
@@ -38,7 +100,15 @@ internal partial class MainViewModel
                 if (outblock_prop != null)
                 {
                     var block_type = outblock_prop.PropertyType;
-                    var data = JsonSerializer.Deserialize(e.RealtimeBody, block_type, _jsonOptions);
+                    object? data = null;
+                    try
+                    {
+                        data = e.RealtimeBody.Deserialize(block_type, _jsonOptions);
+                    }
+                    catch (Exception)
+                    {
+                        data = null;
+                    }
                     if (data != null)
                     {
                         OutputLog(LogKind.실시간계좌응답, $"TrCode={e.TrCode}, Key={e.Key}");
@@ -58,8 +128,6 @@ internal partial class MainViewModel
                     }
                     else
                         OutputLog(LogKind.실시간계좌응답, $"TrCode={e.TrCode}, Key={e.Key}, {e.RealtimeBody}");
-
-                    return;
                 }
             }
         }

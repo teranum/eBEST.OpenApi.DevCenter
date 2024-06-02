@@ -5,7 +5,6 @@ using eBEST.OpenApi.DevCenter.Helpers;
 using eBEST.OpenApi.DevCenter.Models;
 using eBEST.OpenApi.DevCenter.Views;
 using eBEST.OpenApi.Models;
-using Microsoft.VisualBasic.ApplicationServices;
 using System.Windows;
 
 namespace eBEST.OpenApi.DevCenter.ViewModels
@@ -16,7 +15,7 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
         private GithupRepoHelper _githupRepoHelper;
         private IList<GithupRepoHelper.GithubTagInfo>? _releaseTags;
 
-        [ObservableProperty] string _title = "eBEST OpenApi DevCenter";
+        [ObservableProperty] string _title;
         [ObservableProperty] string _statusText = "Ready";
 
         [ObservableProperty] string _statusUrl = string.Empty;
@@ -36,11 +35,13 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
 
         [ObservableProperty] LANG_TYPE _langType = LANG_TYPE.CSHARP;
 
+        public IEnumerable<NotifyProfile> MenuLoginProfiles { get; }
+
         public MainViewModel(IAppRegistry appRegistry)
         {
             var assemblyName = Application.ResourceAssembly.GetName();
             _appVersion = $"{assemblyName.Version!.Major}.{assemblyName.Version.Minor}.{assemblyName.Version.Build}";
-            _title = $"{assemblyName.Name} v{_appVersion}";
+            _title = $"LS증권 OpenApi DevCenter v{_appVersion}";
 
             _appRegistry = appRegistry;
             _githupRepoHelper = new("teranum", "eBEST.OpenApi.DevCenter");
@@ -49,6 +50,7 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
             _openApi.OnConnectEvent += OpenApi_OnConnectEvent;
             _openApi.OnMessageEvent += OpenApi_OnMessageEvent;
             _openApi.OnRealtimeEvent += OpenApi_OnRealtimeEvent;
+            InitialJsonOptions();
 
             // 메인 윈도우 설정값 로딩
             string session = _mainWindow.GetType().Name;
@@ -113,6 +115,20 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
                 }
             }
 
+            // 프로필 로딩
+            const int MAX_PROFILE = 5;
+            MenuLoginProfiles = Enumerable.Range(1, MAX_PROFILE).Select(i =>
+            {
+                string section = $"Profile{i}";
+                string profileName = _appRegistry.GetValue(section, "Name", section);
+                return new NotifyProfile()
+                {
+                    Id = i,
+                    Name = profileName,
+                };
+            });
+
+
             _ = CheckVersionAsync();
 
             LoadTrDatas();
@@ -168,46 +184,68 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
 
         // 메뉴
         [RelayCommand(CanExecute = nameof(CanLogin))]
-        void MenuLogin()
+        async Task MenuLogin(NotifyProfile profile)
         {
             // 기존 키 로딩
-            string AppKey = StringCipher.Decrypt(_appRegistry.GetValue("InitData", "AppKey", string.Empty));
-            string SecretKey = StringCipher.Decrypt(_appRegistry.GetValue("InitData", "SecretKey", string.Empty));
-            //string AppKey = _appRegistry.GetValue("InitData", "AppKey", string.Empty);
-            //string SecretKey = _appRegistry.GetValue("InitData", "SecretKey", string.Empty);
-            bool IsRememberKey = _appRegistry.GetValue("InitData", "IsRememberKey", DefValue: false);
+            int id = profile.Id;
+            string section = $"Profile{id}";
+            string ProfileName = profile.Name;
 
-            var keyWindow = new KeySetting
+            string AppKey = StringCipher.Decrypt(_appRegistry.GetValue(section, "AppKey", string.Empty));
+            string SecretKey = StringCipher.Decrypt(_appRegistry.GetValue(section, "SecretKey", string.Empty));
+            bool IsRememberKey = _appRegistry.GetValue(section, "IsRememberKey", DefValue: false);
+
+            var keyWindow = new KeySetting(ProfileName, AppKey, SecretKey)
             {
-                AppKey = AppKey,
-                SecretKey = SecretKey,
                 IsRememberKey = IsRememberKey,
             };
 
             if (keyWindow.ShowDialog() == true)
             {
+                ProfileName = keyWindow.ProfileName;
                 AppKey = keyWindow.AppKey;
                 SecretKey = keyWindow.SecretKey;
                 IsRememberKey = keyWindow.IsRememberKey;
 
+                _appRegistry.SetValue(section, "Name", ProfileName);
+                profile.Name = ProfileName;
+
                 if (IsRememberKey)
                 {
-                    _appRegistry.SetValue("InitData", "AppKey", StringCipher.Encrypt(AppKey));
-                    _appRegistry.SetValue("InitData", "SecretKey", StringCipher.Encrypt(SecretKey));
-                    //_appRegistry.SetValue("InitData", "AppKey", AppKey);
-                    //_appRegistry.SetValue("InitData", "SecretKey", SecretKey);
-                    _appRegistry.SetValue("InitData", "IsRememberKey", IsRememberKey);
+                    _appRegistry.SetValue(section, "AppKey", StringCipher.Encrypt(AppKey));
+                    _appRegistry.SetValue(section, "SecretKey", StringCipher.Encrypt(SecretKey));
+                    _appRegistry.SetValue(section, "IsRememberKey", IsRememberKey);
                 }
                 else
                 {
-                    _appRegistry.DeleteValue("InitData", "AppKey");
-                    _appRegistry.DeleteValue("InitData", "SecretKey");
-                    _appRegistry.DeleteValue("InitData", "IsRememberKey");
+                    _appRegistry.DeleteValue(section, "AppKey");
+                    _appRegistry.DeleteValue(section, "SecretKey");
+                    _appRegistry.DeleteValue(section, "IsRememberKey");
                 }
-                _ = _openApi.ConnectAsync(AppKey, SecretKey);
+                if (await _openApi.ConnectAsync(AppKey, SecretKey))
+                {
+                    StatusText = "로그인 성공";
+                }
+                else
+                {
+                    StatusText = "로그인 실패";
+                }
             }
+
+            MenuLogoutCommand.NotifyCanExecuteChanged();
         }
         bool CanLogin() => !_openApi.Connected;
+
+        [RelayCommand(CanExecute = nameof(CanLogout))]
+        async Task MenuLogout()
+        {
+            await _openApi.CloseAsync();
+            StatusText = _openApi.LastErrorMessage;
+
+            MenuLoginCommand.NotifyCanExecuteChanged();
+        }
+        bool CanLogout() => _openApi.Connected;
+
         [RelayCommand] static void MenuExit() => System.Windows.Application.Current.Shutdown();
 
         [RelayCommand]
@@ -227,5 +265,11 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
             }
         }
 
+        public partial class NotifyProfile : ObservableObject
+        {
+            public required int Id;
+            [ObservableProperty] string _name = string.Empty;
+            public override string ToString() => Name;
+        }
     }
 }
