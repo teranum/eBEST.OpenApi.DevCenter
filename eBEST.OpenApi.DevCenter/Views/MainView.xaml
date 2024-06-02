@@ -46,6 +46,7 @@
                             <MenuItem Header="OpenApi 접속" ItemsSource="{Binding MenuLoginProfiles}">
                                 <MenuItem.ItemContainerStyle>
                                     <Style TargetType="{x:Type MenuItem}">
+                                        <Setter Property="Header" Value="{Binding Name}" />
                                         <Setter Property="Command" Value="{Binding Path=DataContext.MenuLoginCommand, ElementName=root}" />
                                         <Setter Property="CommandParameter" Value="{Binding}" />
                                     </Style>

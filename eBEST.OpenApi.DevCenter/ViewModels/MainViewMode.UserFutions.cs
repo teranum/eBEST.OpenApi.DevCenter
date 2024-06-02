@@ -87,8 +87,8 @@ internal partial class MainViewModel
         {
         }
 
-        CSharp샘플.IsExpanded = true;
-        파이썬샘플.IsExpanded = true;
+        //CSharp샘플.IsExpanded = true;
+        //파이썬샘플.IsExpanded = true;
         OrgItems.Add(CSharp샘플);
         OrgItems.Add(파이썬샘플);
     }

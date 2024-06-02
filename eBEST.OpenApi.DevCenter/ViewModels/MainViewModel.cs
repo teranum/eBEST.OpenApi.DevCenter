@@ -116,16 +116,12 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
             }
 
             // 프로필 로딩
-            const int MAX_PROFILE = 5;
+            const int MAX_PROFILE = 8;
             MenuLoginProfiles = Enumerable.Range(1, MAX_PROFILE).Select(i =>
             {
                 string section = $"Profile{i}";
                 string profileName = _appRegistry.GetValue(section, "Name", section);
-                return new NotifyProfile()
-                {
-                    Id = i,
-                    Name = profileName,
-                };
+                return new NotifyProfile(i, profileName);
             });
 
 
@@ -207,21 +203,41 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
                 SecretKey = keyWindow.SecretKey;
                 IsRememberKey = keyWindow.IsRememberKey;
 
-                _appRegistry.SetValue(section, "Name", ProfileName);
-                profile.Name = ProfileName;
+                if (string.IsNullOrEmpty(ProfileName) || string.IsNullOrEmpty(AppKey) || string.IsNullOrEmpty(SecretKey))
+                {
+                    OutputLog(LogKind.LOGS, "프로필명, AppKey, SecretKey를 입력해주세요.");
+                    return;
+                }
+
+                // 동일한 프로필명이 있는지 체크
+                if ( !ProfileName.Equals(profile.Name))
+                {
+                    foreach (var item in MenuLoginProfiles)
+                    {
+                        if (item.Name.Equals(ProfileName))
+                        {
+                            OutputLog(LogKind.LOGS, "이미 동일한 프로필명이 있습니다.");
+                            return;
+                        }
+                    }
+
+                    _appRegistry.SetValue(section, "Name", ProfileName);
+                    profile.Name = ProfileName;
+                }
 
                 if (IsRememberKey)
                 {
                     _appRegistry.SetValue(section, "AppKey", StringCipher.Encrypt(AppKey));
                     _appRegistry.SetValue(section, "SecretKey", StringCipher.Encrypt(SecretKey));
-                    _appRegistry.SetValue(section, "IsRememberKey", IsRememberKey);
                 }
                 else
                 {
                     _appRegistry.DeleteValue(section, "AppKey");
                     _appRegistry.DeleteValue(section, "SecretKey");
-                    _appRegistry.DeleteValue(section, "IsRememberKey");
                 }
+                _appRegistry.SetValue(section, "IsRememberKey", IsRememberKey);
+
+                OutputLog(LogKind.LOGS, $"로그인 요청중...({ProfileName})");
                 if (await _openApi.ConnectAsync(AppKey, SecretKey))
                 {
                     StatusText = "로그인 성공";
@@ -241,6 +257,8 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
         {
             await _openApi.CloseAsync();
             StatusText = _openApi.LastErrorMessage;
+
+            OutputLog(LogKind.LOGS, "로그아웃");
 
             MenuLoginCommand.NotifyCanExecuteChanged();
         }
@@ -265,11 +283,10 @@ namespace eBEST.OpenApi.DevCenter.ViewModels
             }
         }
 
-        public partial class NotifyProfile : ObservableObject
+        internal partial class NotifyProfile(int id, string name) : ObservableObject
         {
-            public required int Id;
-            [ObservableProperty] string _name = string.Empty;
-            public override string ToString() => Name;
+            public int Id = id;
+            [ObservableProperty] string _name = name;
         }
     }
 }
